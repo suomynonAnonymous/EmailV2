@@ -1,0 +1,150 @@
+.header {
+    z-index: 999;
+    position: fixed;
+    right: 0;
+    left: $navigation-width;
+    top: 0;
+    background-color: white;
+    padding: 30px;
+
+    .avatar {
+        border-color: transparent;
+
+        &.avatar-state-success {
+            &:before {
+                border-color: $color-primary
+            }
+        }
+    }
+
+    .header-container {
+        display: flex;
+        position: relative;
+        border: 1px solid darken(white, 10%);
+        border-radius: $default-border-radius;
+        height: $header-height;
+        padding: 0 10px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        .navigation-toggler {
+            display: none;
+            margin-right: 20px;
+
+            a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: rgba(black, .6);
+                font-size: 20px;
+
+                &:hover {
+                    color: black;
+                }
+            }
+        }
+    }
+
+    .header-right {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex: auto;
+        justify-content: space-between;
+
+        ul.navbar-nav {
+            margin-left: auto;
+        }
+
+        .btn-mobile-search {
+            display: none;
+        }
+    }
+
+    .header-toggler {
+        display: none;
+
+        a.nav-link {
+            padding: 20px !important;
+            font-size: 20px;
+        }
+    }
+
+    [data-toggle="fullscreen"] {
+        .minimize {
+            display: none;
+        }
+    }
+
+    .active-fullscreen {
+        .minimize {
+            display: block;
+        }
+
+        .maximize {
+            display: none;
+        }
+    }
+
+    .header-search-form {
+        flex: 1;
+
+        .form-control {
+            background: none;
+            padding: 0 5px;
+        }
+
+        .btn {
+            background: none;
+        }
+    }
+
+    ul.navbar-nav {
+        flex-direction: row;
+        align-items: center;
+
+        li.nav-item {
+
+
+            a.nav-link {
+                position: relative;
+                line-height: 100%;
+                padding: 10px 15px;
+
+                &.mobile-header-search-btn {
+                    display: none;
+                }
+
+                .nav-link-notify {
+                    position: absolute;
+                    padding: 0;
+                    min-width: 13px;
+                    line-height: 15px;
+                    height: 14px;
+                    right: 2px;
+                    top: 0px;
+                    font-size: 10px;
+                }
+
+                &:hover, &:focus {
+                    outline: none;
+                    color: black;
+                }
+            }
+        }
+
+        & + form.search {
+            margin-left: 1.5rem;
+        }
+    }
+
+    .dropdown-menu {
+        position: absolute;
+    }
+}
+
+

@@ -1,0 +1,23 @@
+.page-header {
+    padding-top: 3px;
+
+    .page-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        padding-bottom: 30px;
+
+        h1, h2, h3, h4, h5 {
+            margin: 0;
+            font-weight: 600;
+            line-height: 20px;
+            color: $color-primary;
+        }
+
+        p {
+            margin-bottom: 0;
+            line-height: 15px;
+        }
+    }
+}

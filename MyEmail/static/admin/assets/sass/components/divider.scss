@@ -1,0 +1,81 @@
+
+
+.divider-text {
+    display: flex;
+    align-items: center;
+
+    &:after {
+        content: '';
+        display: block;
+        height: 1px;
+        background-color: #ddd;
+        flex: 1;
+    }
+
+    span {
+        margin-right: 1rem;
+    }
+
+    &.divider-center {
+        flex-direction: row-reverse;
+
+        &:before {
+            content: '';
+            display: block;
+            height: 1px;
+            background-color: #ddd;
+            flex: 1;
+        }
+
+        span {
+            margin-right: 1rem;
+            margin-left: 1rem;
+        }
+    }
+
+    &.divider-right {
+        flex-direction: row-reverse;
+
+        span {
+            margin-right: 0;
+            margin-left: 1rem;
+        }
+    }
+
+    &.divider-primary {
+        &:before, &:after {
+            background-color: $color-primary;
+        }
+    }
+
+    &.divider-secondary {
+        &:before, &:after {
+            background-color: $color-secondary;
+        }
+    }
+
+    &.divider-success {
+        &:before, &:after {
+            background-color: $color-success;
+        }
+    }
+
+    &.divider-info {
+        &:before, &:after {
+            background-color: $color-info;
+        }
+    }
+
+    &.divider-danger {
+        &:before, &:after {
+            background-color: $color-danger;
+        }
+    }
+
+    &.divider-warning {
+        &:before, &:after {
+            background-color: $color-warning;
+        }
+    }
+
+}

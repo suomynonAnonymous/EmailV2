@@ -1,0 +1,109 @@
+{%load static%}
+<div class="card-header">
+    <div class="app-detail-action-left align-items-center">
+        <a class="app-detail-close-button btn btn-outline-light mr-3 email_back_button" href="">
+            <i class="ti-arrow-left"></i>
+        </a>
+        <h5 class="mb-0" id="card_content_subject">
+            {{ object.mail.subject }}
+        </h5>
+        <span class="badge bg-success-bright text-success ml-1" id="card_content_label">
+            {{ object.mail.get_label_display }}</span>
+    </div>
+    <div class="app-detail-action-right">
+        <div>
+            <a href="#" class="btn btn-outline-light" data-toggle="tooltip" title="Reply">
+                <i class="ti-back-right"></i>
+            </a>
+            <a href="#" class="btn btn-outline-light ml-2" data-toggle="tooltip"
+               title="Mark as spam">
+                <i class="ti-info-alt"></i>
+            </a>
+            <a href="#" class="btn btn-outline-danger ml-2" data-toggle="tooltip"
+               title="Dispose">
+                <i class="ti-trash"></i>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="app-detail-article">
+        <div class="card-body">
+            <div class="d-flex mb-4">
+                <div class="d-flex align-items-center">
+                    <figure class="avatar mr-3">
+                        <img src="{%static "/admin/assets/media/image/user/women_avatar5.jpg"%}"
+                        class="rounded-circle"
+                        alt="image">
+                    </figure>
+                    <div>
+                        <h6 class="m-b-0">
+                        <span class="text-primary"
+                              id="card_content_sender">{{ object.mail.sender }}</span>
+                            <!--                                            <span class="d-sm-inline d-none text-muted"> &lt;elnora@gmail.com&gt;</span>-->
+                        </h6>
+                        <span class="small text-muted" id="card_content_receiver">{{ object.receiver }}</span>
+                    </div>
+                </div>
+                <div class="ml-auto">
+                    <a href="#" data-toggle="tooltip" title="Attachment" class="mr-2">
+                        <i class="fa fa-paperclip"></i>
+                    </a>
+                    <a href="#" class="mr-2">
+                        <i class=" fa fa-star font-size-16 text-warning "></i>
+                    </a>
+
+                    <span class="text-muted" id="card_content_viewed_date">{{ object.send_date }}</span>
+                </div>
+            </div>
+
+            <p id="card_content_body">
+                {{ object.mail.body }}
+            </p>
+
+        </div>
+        <hr class="m-0">
+        <div class="card-body" id="card_attach_div">
+            <reply_formh6 class="mb-3 font-size-11 text-uppercase">Attached Files</reply_formh6>
+            <ul class="list-unstyled mb-0">
+                <li class="small">
+                    <a href="" id="card_content_attached_files">
+                        <i data-feather="paperclip" class="mr-1 width-15 height-15"></i>
+                        uikit-design.psd
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <hr class="m-0">
+        <div class="card-body">
+            <h6 class="mb-3 font-size-11 text-uppercase">Reply</h6>
+            <form method="POST" action="" id="reply_form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="reply-email-quill-editor mb-3"></div>
+                <div class="d-flex justify-content-between">
+                    <div class="reply-email-quill-toolbar">
+                                <span class="ql-formats mr-0">
+                                  <button class="ql-bold"></button>
+                                  <button class="ql-italic"></button>
+                                  <button class="ql-underline"></button>
+                                  <button class="ql-link"></button>
+                                  <button class="ql-image"></button>
+                                </span>
+                    </div>
+
+                    <input type="hidden" name="body" id="reply_body">
+                    <button type="submit" class="btn btn-primary">Send</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    $(".email_back_button").click(function(){
+
+      location.reload();
+      });
+
+</script>

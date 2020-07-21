@@ -1,0 +1,82 @@
+{%extends 'MyEmail/mail.html'%}
+{%load static%}
+{% block email_detail %}
+<div class="card app-detail">
+<div class="card-header">
+    <div class="app-detail-action-left align-items-center">
+        <a class="app-detail-close-button btn btn-outline-light mr-3 email_back_button" href="">
+            <i class="ti-arrow-left"></i>
+        </a>
+            <a href="#" class="btn btn-outline-danger ml-2" data-toggle="tooltip" style="float:right;"
+               title="Dispose">
+                <i class="ti-trash"></i>
+            </a>
+    </div>
+</div>
+<div class="app-detail-article">
+    <div class="card-body">
+        <form method="POST" id="draft_submit_form"
+              action="{% url 'mail_draft_detail' object.pk %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+
+<!--                            <input type="text" class="form-control tagsinput" name = "to" placeholder="To"-->
+<!--                                   {% if object %}-->
+<!--                                    value="{{ object.receiver.username }}"-->
+<!--                                   {% endif %}-->
+<!--                                   required>-->
+
+                <select name="receiver_multiple" class="form-control select2-example"
+                        id="receiver_multiple_draft" multiple>
+                    {% for u in user_list %}
+                    <option value="{{ u.pk }}">{{ u.username }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+                <input type="hidden" name="receiver_list" id="receiver_list_draft" value="">
+                <input type="hidden" name="sender" value="{{ request.user.pk }}">
+
+            </div>
+
+            <div class="form-group">
+                <input type="text" class="form-control" name = "subject"
+                       value="{{ object.subject }}"
+                       placeholder="Subject" required>
+            </div>
+
+            <div class="form-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name = "file_upload"
+
+                           multiple id="customFileLangHTMLDraft" value="{% if object.file %}{{ object.file.url }}{% endif %}">
+                    <label class="custom-file-label" for="customFileLangHTML" data-browse="Select files">
+                        {% if object.file %}{{ object.file.name }}{% endif %}</label>
+                </div>
+            </div>
+            <div>
+                <div class="form-group d-none">
+                    <textarea class="form-control" id="input_body_draft" name = "body" rows="4" cols="50" placeholder="Type Your Email...." required>
+                    </textarea>
+                    </div>
+                <div class="compose-quill-editor quill_draft mb-3" >
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div class="compose-quill-toolbar">
+                <span class="ql-formats mr-0">
+                    <button class="ql-bold"></button>
+                    <button class="ql-italic"></button>
+                    <button class="ql-underline"></button>
+                    <button class="ql-link"></button>
+                    <button class="ql-image"></button>
+                </span>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

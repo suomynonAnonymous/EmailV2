@@ -1,0 +1,46 @@
+.profile-container {
+
+    background-color: red;
+    background-size: cover !important;
+    background-position: center !important;
+    height: 300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    border-radius: $default-border-radius;
+    color: rgba(white, .9);
+    box-shadow: 0 5px 10px rgba(62, 85, 120, .045);
+    overflow: hidden;
+
+    .avatar {
+        border-width: 5px;
+        border-color: darken(white, 6%);
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: 1;
+        padding: 20px 30px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.70));
+    }
+
+    .profile-menu {
+        margin-left: auto;
+
+        ul {
+            margin-bottom: 5px;
+
+            li {
+                a {
+                    color: rgba(white, .9)
+                }
+            }
+        }
+    }
+
+}
