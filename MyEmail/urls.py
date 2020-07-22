@@ -1,10 +1,13 @@
 from django.urls import path
 
 from MyEmail.views import MailListView, mail_starred, mail_deleted, mail_send, mail_viewed, mail_unread, mail_spam, \
-    MailDraftView, MailDetailView, DraftUpdateView
+    MailDraftView, MailDetailView, DraftUpdateView, MailMultipleCreate, DraftCreateView, ReplyCreateView
 
 urlpatterns = [
     path('mail_list_class', MailListView.as_view(), name='mail_list_class'),
+    path('mail_create_class', MailMultipleCreate.as_view(), name='mail_create_class'),
+    path('draft_create_class', DraftCreateView.as_view(), name='draft_create_class'),
+    path('reply_create_class/<int:pk>', ReplyCreateView.as_view(), name='reply_create_class'),
     path('mail_draft_class', MailDraftView.as_view(), name='mail_draft_class'),
     path('mail_spam/<int:pk>', mail_spam, name='mail_spam'),
     path('mail_starred/<int:pk>', mail_starred, name='mail_starred'),

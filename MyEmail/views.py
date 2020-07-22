@@ -2,9 +2,10 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, DetailView, UpdateView
+from django.views import View
+from django.views.generic import ListView, DetailView, UpdateView, CreateView
 
-from .forms import DraftUpdateForm
+from .forms import DraftUpdateForm, MailReceiverForm, MailForm
 from .models import Mail, MailReceiver
 
 
@@ -14,9 +15,12 @@ class MailDraftView(ListView):
     template_name = "MyEmail/mail.html"
 
     def get_queryset(self):
-        email_type = self.request.GET.get('email_type', "inbox")
+        email_type = self.request.GET.get('email_type', "send")
+        queryset = Mail.objects.order_by('-created_date')
+        if email_type == "send":
+            queryset = queryset.filter(sender=self.request.user)
+            queryset = queryset.filter(sender_delete=False)
         if email_type == "draft":
-            queryset = Mail.objects.order_by('-created_date')
             queryset = queryset.filter(sender=self.request.user)
             queryset = queryset.filter(mail_draft=True)
 
@@ -52,7 +56,7 @@ class MailListView(ListView):
     template_name = "MyEmail/mail.html"
 
     def get_queryset(self):
-        queryset = MailReceiver.objects.order_by('-send_date')
+        queryset = MailReceiver.objects.order_by('-received_date')
         # queryset = queryset.filter(Q(receiver=self.request.user) | Q(mail__sender=self.request.user))
         email_type = self.request.GET.get('email_type', "inbox")
         if email_type == "inbox":
@@ -60,12 +64,9 @@ class MailListView(ListView):
         if email_type == "starred":
             queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_starred=True))
         if email_type == "spam":
-            queryset = queryset.filter (Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=True))
-        if email_type == "send":
-            queryset = queryset.filter(mail__sender=self.request.user)
-            queryset = queryset.filter(mail_deleted=False, mail_send=True)
+            queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=True))
         if email_type == "trash":
-            queryset = queryset.filter(Q(receiver=self.request.user) | Q(mail__sender=self.request.user) )
+            queryset = queryset.filter(Q(receiver=self.request.user) | Q(mail__sender=self.request.user))
             queryset = queryset.filter(mail_deleted=True)
 
         search = self.request.GET.get('search', "")
@@ -73,7 +74,7 @@ class MailListView(ListView):
             mail__subject__icontains=search))
         filter_type = self.request.GET.get('filter', "date")
         if filter_type == "date":
-            queryset = queryset.order_by('-send_date')
+            queryset = queryset.order_by('-received_date')
         if filter_type == "from":
             queryset = queryset.order_by('mail__sender__username')
         if filter_type == "subject":
@@ -94,9 +95,66 @@ class MailListView(ListView):
         return context
 
 
-class MailDetailView(DetailView):
-    model = MailReceiver
-    template_name = "MyEmail/detail.html"
+class MailMultipleCreate(View):
+    def post(self, request, *args, **kwargs):
+        m_form = MailForm(request.POST, request.FILES)
+        m_obj = m_form.save(commit=False)
+        m_obj.save()
+        receiver_list = self.request.POST['receiver_list']
+
+        r_list = []
+        if len(receiver_list):
+            r_list = receiver_list.split(',')
+
+        for r in r_list:
+            mail_form = MailReceiverForm(request.POST, request.FILES)
+            mail_obj = mail_form.save(commit=False)
+            mail_obj.mail_send = True
+            receiver = User.objects.get(pk=int(r))
+            mail_obj.receiver = receiver
+            mail_obj.mail = m_obj
+            mail_obj.save()
+
+        email_type = self.request.GET.get("email_type", "inbox")
+        return redirect(reverse('mail_list_class') + '?email_type' + email_type)
+
+
+class DraftCreateView(CreateView):
+    model = Mail
+    template_name = "MyEmail/mail.html"
+    form_class = MailForm
+    success_url = reverse_lazy('mail_draft_class')
+
+    def form_invalid(self, form):
+        r = super().form_invalid(form)
+        print(form.errors)
+        return r
+
+    def form_valid(self, form):
+        self.success_url = self.success_url + "?email_type=draft"
+        r = super().form_valid(form)
+        self.object.mail_draft = True
+        self.object.save()
+        return r
+
+
+class ReplyCreateView(CreateView):
+    model = Mail
+    template_name = "MyEmail/mail.html"
+    form_class = MailForm
+    success_url = reverse_lazy('mail_draft_class')
+
+    def form_invalid(self, form):
+        r = super().form_invalid(form)
+        print(form.errors)
+        return r
+
+    def form_valid(self, form):
+        self.success_url = self.success_url + "?email_type=draft"
+        r = super().form_valid(form)
+        self.object.reply_to = get_object_or_404(Mail, pk=self.kwargs['pk'])
+        self.object.save()
+        return r
 
 
 class DraftUpdateView(UpdateView):
@@ -129,12 +187,15 @@ class DraftUpdateView(UpdateView):
         for r in r_list:
             m_rec = MailReceiver()
             m_rec.mail = self.object
-            m_rec.mail_send = True
             m_rec.receiver = User.objects.get(pk=int(r))
             m_rec.save()
 
         return to_return
 
+
+class MailDetailView(DetailView):
+    model = MailReceiver
+    template_name = "MyEmail/detail.html"
 
 
 def mail_starred(request, pk):

@@ -23,11 +23,12 @@
                             active
                             {% endif %}
                            d-flex align-items-center">
-                            <i class="ti-email list-group-icon mr-2 text-primary"></i>Inbox
+                            <i class="ti-email list-group-icon mr-2 text-primary"></i>
+                            Inbox
                             <span class="small ml-auto">{{ inbox_count }}</span>
 
                         </a>
-                        <a href="{% url 'mail_list_class' %}?email_type=send"
+                        <a href="{% url 'mail_draft_class' %}?email_type=send"
 
                            class="list-group-item
                             {% if 'send' in request.get_full_path %}
@@ -103,7 +104,7 @@
             </div>
         </div>
         <div class="col-md-9 app-content">
-            {% block email_detail %}
+
             <div class="app-content-overlay"></div>
             <div class="app-action">
                 <div class="action-left">
@@ -332,10 +333,8 @@
                                         <div class="mb-1 d-flex justify-content-between align-items-center">
                                             <div class="text-truncate app-list-title">
                                                 {% if 'mail_draft_class' in request.get_full_path %}
-                                                        {%for email in mail_list%}
                                                         {{email.sender}}
                                                     &lt{{email.sender.email}}&gt
-                                                            {%endfor%}
                                                             {%else%}
                                                      {{email.mail.sender}}
                                                 &lt{{email.mail.sender.email}}&gt
@@ -344,9 +343,7 @@
                                             <div class="pl-3 d-flex">
                                                 <span class="text-nowrap text-muted">
                                                     {% if 'mail_draft_class' in request.get_full_path %}
-                                                        {%for email in mail_list%}
                                                     {{email.created_date|date:"d F"}}
-                                                        {%endfor%}
                                                         {%else%}
                                                     {{email.viewed_date|date:"d F"}}
                                                         {%endif%}
@@ -383,13 +380,11 @@
                                         </div>
                                         <div class="text-muted d-flex justify-content-between">
                                             <div class="text-truncate small">
-                                              {% if 'mail_draft_class' in request.get_full_path %}
-                                                {%for email in mail_list%}
-                                                {{email.subject}}
-                                                {%endfor%}
-                                                {%else%}
+                                            {% if 'mail_draft_class' in request.get_full_path %}
+                                                    {{email.subject}}
+                                            {%else%}
                                                 {{email.mail.subject}}
-                                                {%endif%}
+                                            {%endif%}
                                             </div>
                                             <div class="text-nowrap pl-3">
                                                 <ul class="list-inline">
@@ -402,6 +397,7 @@
                                     </div>
                                 </li>
                                 {%endfor%}
+                        <li class="list-group-item d-none card_display_email" data-dummy_data="true"></li>
 
                     </ul>
                 </div>
@@ -412,109 +408,10 @@
                 <!-- end::app-lists -->
 
                 <!-- begin:app-detail -->
-                <div class="card app-detail">
-
-<!--                    <div class="card-header">-->
-<!--                        <div class="app-detail-action-left align-items-center">-->
-<!--                            <a class="app-detail-close-button btn btn-outline-light mr-3 email_back_button" href="">-->
-<!--                                <i class="ti-arrow-left"></i>-->
-<!--                            </a>-->
-<!--                            <h5 class="mb-0" id="card_content_subject">-->
-<!--                                Advertising Internet-->
-
-
-<!--                                    </h5><span class="badge bg-success-bright text-success ml-1" id="card_content_label">Freelance</span>-->
-<!--                                </div>-->
-<!--                                <div class="app-detail-action-right">-->
-<!--                                    <div>-->
-<!--                                        <a href="#" class="btn btn-outline-light" data-toggle="tooltip" title="Reply">-->
-<!--                                            <i class="ti-back-right"></i>-->
-<!--                                        </a>-->
-<!--                                        <a href="#" class="btn btn-outline-light ml-2" data-toggle="tooltip"-->
-<!--                                           title="Mark as spam">-->
-<!--                                            <i class="ti-info-alt"></i>-->
-<!--                                        </a>-->
-<!--                                        <a href="#" class="btn btn-outline-danger ml-2" data-toggle="tooltip"-->
-<!--                                           title="Dispose">-->
-<!--                                            <i class="ti-trash"></i>-->
-<!--                                        </a>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="app-detail-article">-->
-<!--                                <div class="card-body">-->
-<!--                                    <div class="d-flex mb-4">-->
-<!--                                        <div class="d-flex align-items-center">-->
-<!--                                            <figure class="avatar mr-3">-->
-<!--                                                <img src="{%static "/admin/assets/media/image/user/women_avatar5.jpg"%}"-->
-<!--                                                class="rounded-circle"-->
-<!--                                                alt="image">-->
-<!--                                            </figure>-->
-<!--                                            <div>-->
-<!--                                                <h6 class="m-b-0">-->
-<!--                                                    <span class="text-primary"-->
-<!--                                                          id="card_content_sender">Valentine Maton</span>-->
-<!--                                                    &lt;!&ndash;                                            <span class="d-sm-inline d-none text-muted"> &lt;elnora@gmail.com&gt;</span>&ndash;&gt;-->
-<!--                                                </h6>-->
-<!--                                                <span class="small text-muted" id="card_content_receiver">to Lois Jimenez</span>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                        <div class="ml-auto">-->
-<!--                                            <a href="#" data-toggle="tooltip" title="Attachment" class="mr-2">-->
-<!--                                                <i class="fa fa-paperclip"></i>-->
-<!--                                            </a>-->
-<!--                                            <a href="#" class="mr-2">-->
-<!--                                                <i class=" fa fa-star font-size-16 text-warning "></i>-->
-<!--                                            </a>-->
-
-<!--                                    <span class="text-muted" id="card_content_viewed_date">4:14 AM</span>-->
-<!--                                </div>-->
-<!--                            </div>-->
-
-<!--                            <p id="card_content_body"></p>-->
-
-<!--                        </div>-->
-<!--                        <hr class="m-0">-->
-<!--                        <div class="card-body" id="card_attach_div">-->
-<!--                            <reply_formh6 class="mb-3 font-size-11 text-uppercase" >Attached Files</reply_formh6>-->
-<!--                            <ul class="list-unstyled mb-0">-->
-<!--                                <li class="small">-->
-<!--                                    <a href="" id ="card_content_attached_files">-->
-<!--                                        <i data-feather="paperclip" class="mr-1 width-15 height-15" ></i>-->
-<!--                                        uikit-design.psd-->
-<!--                                    </a>-->
-<!--                                </li>-->
-
-<!--                            </ul>-->
-<!--                        </div>-->
-
-<!--                        <hr class="m-0">-->
-<!--                        <div class="card-body">-->
-<!--                            <h6 class="mb-3 font-size-11 text-uppercase">Reply</h6>-->
-<!--                            <form method="POST" action="" id="reply_form" enctype="multipart/form-data">-->
-<!--                                {% csrf_token %}-->
-<!--                                <div class="reply-email-quill-editor mb-3"></div>-->
-<!--                                <div class="d-flex justify-content-between">-->
-<!--                                    <div class="reply-email-quill-toolbar">-->
-<!--                                            <span class="ql-formats mr-0">-->
-<!--                                              <button class="ql-bold"></button>-->
-<!--                                              <button class="ql-italic"></button>-->
-<!--                                              <button class="ql-underline"></button>-->
-<!--                                              <button class="ql-link"></button>-->
-<!--                                              <button class="ql-image"></button>-->
-<!--                                            </span>-->
-<!--                                    </div>-->
-
-<!--                                        <input type="hidden" name="body" id="reply_body">-->
-<!--                                        <button type="submit" class="btn btn-primary">Send</button>-->
-
-<!--                                </div>-->
-<!--                            </form>-->
-<!--                        </div>-->
-<!--                    </div>-->
-                </div>
+                {% block email_detail %}
+                {% endblock %}
             </div>
-            {% endblock %}
+
         </div>
     </div>
 
@@ -544,7 +441,7 @@
                         </div>
                     </div>
                     <form method="POST" id="email_submit_form"
-                          action=""
+                          action="mail_create_class"
                           enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="form-group">
@@ -577,7 +474,7 @@
 
                         <div class="form-group">
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" name = "file_upload" multiple id="customFileLangHTML">
+                                <input type="file" class="custom-file-input" name = "file" multiple id="customFileLangHTML">
                                 <label class="custom-file-label" for="customFileLangHTML" data-browse="Select files">Voeg
                                     je document toe</label>
                             </div>
@@ -689,6 +586,13 @@
     $( document ).ready(function() {
         $("#customCheckAll").prop('checked',false);
         $(".email_checkbox").prop('checked',false);
+        {% if "mail_draft_detail" in request.get_full_path %}
+            $(".draft_article").find(".ql-editor").html("{{ object.body|safe }}");
+            $(".card_display_email").click();
+        {% endif %}
+        {% if "mail_detail" in request.get_full_path %}
+            $(".card_display_email").click();
+        {% endif %}
     });
 
     $(".select2-example").select2({
@@ -696,7 +600,8 @@
     });
 
     $("#email_submit_form").submit(function(){
-        $("#input_body").html($(".compose-quill-editor").find("p").html());
+        //$("#input_body").html($(".compose-quill-editor").find("p").html());
+        $("#input_body").html($(".compose-quill-editor").find(".ql-editor").html());
         console.log("hello");
         console.log($("#input_body").html());
         let url_send = $("#email_submit_form").attr('action') + "?is_send=True";
@@ -705,7 +610,8 @@
     });
 
     $("#draft_submit_form").submit(function(){
-        $("#input_body_draft").html($(".quill_draft").find("p").html());
+        //$("#input_body_draft").html($(".quill_draft").find("p").html());
+        $("#input_body_draft").html($(".quill_draft").find(".ql-editor").html());
         console.log("hello");
         console.log($("#input_body_draft").html());
         let url_send = $("#draft_submit_form").attr('action') + "?is_send=True";
@@ -716,67 +622,67 @@
     // ///reply:
     $("#reply_form").submit(function(e){
         // e.preventDefault()
-        $("#reply_body").val($(".reply-email-quill-editor").find("p").html());
+        //$("#reply_body").val($(".reply-email-quill-editor").find("p").html());
+        $("#reply_body").val($(".reply-email-quill-editor").find(".ql-editor").html());
         console.log("hello");
         console.log($("#reply_body").val());
 
-        $("#email_submit_form").attr('action',url_send);
         $("#receiver_list").val($("#receiver_multiple").val());
     });
 
     $("#draft_email_create").click(function(){
-        let url_send = $("#email_submit_form").attr('action') + "?draft=True";
+        let url_send = "{% url 'draft_create_class' %}";
         $("#email_submit_form").attr('action',url_send);
         $("#email_submit_form").submit();
     });
 
     // Email Detailed View
-    $(".card_display_email").click(function(){
+    //$(".card_display_email").click(function(){
 
      //   console.log($("#reply_form"));
      //   console.log(url_send);
 
         // //// if email is a parent(original) display at top:
 
-        $("#card_content_subject").html($(this).attr("data-email_subject"));
-        $("#card_content_label").html($(this).attr("data-email_label"));
+       // $("#card_content_subject").html($(this).attr("data-email_subject"));
+       // $("#card_content_label").html($(this).attr("data-email_label"));
 
-        $("#card_content_body").html($(this).attr("data-email_body"));
-        $("#card_content_sender").html($(this).attr("data-email_sender"));
-        $("#card_content_receiver").html($(this).attr("data-email_receiver"));
-        $("#card_content_viewed_date").html($(this).attr("data-email_viewed_date"));
-        $("#card_content_attached_files").attr("href", ($(this).attr("data-email_attached_files")));
-        $("#card_content_attached_files").html($(this).attr("data-email_file_name").replace("files/",""));
-        console.log($(this).attr("data-email_file_name"));
-        if ($(this).attr("data-email_file_name") === "")
-        {
-            $("#card_attach_div").hide();
-        }
+       // $("#card_content_body").html($(this).attr("data-email_body"));
+       // $("#card_content_sender").html($(this).attr("data-email_sender"));
+       // $("#card_content_receiver").html($(this).attr("data-email_receiver"));
+       // $("#card_content_viewed_date").html($(this).attr("data-email_viewed_date"));
+       // $("#card_content_attached_files").attr("href", ($(this).attr("data-email_attached_files")));
+       // $("#card_content_attached_files").html($(this).attr("data-email_file_name").replace("files/",""));
+       // console.log($(this).attr("data-email_file_name"));
+       // if ($(this).attr("data-email_file_name") === "")
+       // {
+       //     $("#card_attach_div").hide();
+       // }
 
-         let url_reply = "";
-        $("#reply_form").attr('action', url_reply);
+        // let url_reply = "";
+        //$("#reply_form").attr('action', url_reply);
 
-        {% for email in object_list %}
-            {% for reply in email.get_reply %}
-                if ("{{ email.pk }}" === $(this).attr('list_email_id')){
-                    let new_html = $("#reply_copy_temp").html().replaceAll('change_email_pk', "{{ reply.pk }}");
-                    $("#card_attach_div").after(new_html);
+        //{% for email in object_list %}
+         //   {% for reply in email.get_reply %}
+         //       if ("{{ email.pk }}" === $(this).attr('list_email_id')){
+         //           let new_html = $("#reply_copy_temp").html().replaceAll('change_email_pk', "{{ reply.pk }}");
+         //           $("#card_attach_div").after(new_html);
 
-                    $("#card_content_body_{{ reply.pk }}").html("{{ reply.body }}");
-                    $("#card_content_sender_{{ reply.pk }}").html("{{ reply.sender }}");
-                    $("#card_content_receiver_{{ reply.pk }}").html("{{ reply.receiver }}");
-                    $("#card_content_viewed_date_{{ reply.pk }}").html("{{ reply.viewed_date }}");
-                    $("#card_content_attached_files_{{ reply.pk }}").attr("href", ($(this).attr("{% if email.file_upload %}{{email.file_upload.url}}{% endif %}")));
-                    $("#card_content_attached_files_{{ reply.pk }}").html("{% if email.file_upload %}{{email.file_upload.name}}{% endif %}".replace("files/",""));
-                    console.log($("#card_content_attached_files_{{ reply.pk }}"));
-                    if ("{% if email.file_upload %}{{email.file_upload.url}}{% endif %}" === ""){
-                        $("#card_attach_div_{{ reply.pk }}").hide();
-                    }
-                }
-            {% endfor %}
-        {% endfor %}
+        //            $("#card_content_body_{{ reply.pk }}").html("{{ reply.body }}");
+        //            $("#card_content_sender_{{ reply.pk }}").html("{{ reply.sender }}");
+        //            $("#card_content_receiver_{{ reply.pk }}").html("{{ reply.receiver }}");
+        //            $("#card_content_viewed_date_{{ reply.pk }}").html("{{ reply.viewed_date }}");
+        //            $("#card_content_attached_files_{{ reply.pk }}").attr("href", ($(this).attr("{% if email.file_upload %}{{email.file_upload.url}}{% endif %}")));
+        //            $("#card_content_attached_files_{{ reply.pk }}").html("{% if email.file_upload %}{{email.file_upload.name}}{% endif %}".replace("files/",""));
+        //            console.log($("#card_content_attached_files_{{ reply.pk }}"));
+        //            if ("{% if email.file_upload %}{{email.file_upload.url}}{% endif %}" === ""){
+        //                $("#card_attach_div_{{ reply.pk }}").hide();
+        //            }
+        //       }
+        //    {% endfor %}
+        //{% endfor %}
 
-    });
+    //});
 
     // Mark As Viewed On Click Email
     $(".card_display_email").click(function(){
@@ -804,42 +710,35 @@
 
     });
 
-    $(".card_display_email").click(function(){
-        console.log("asdfasdfasdf");
-        let get_url = "";
-        let email_id = $(this).attr('list_email_id');
-        let this_el = $(this);
-        //console.log(email_id)
-        {% if email_type == 'draft' %}
-            get_url = "{%url 'mail_draft_detail' pk=1234 %}".replace('1234', email_id);
-            window.location.href = get_url;
-        {% else %}
-            get_url = "{%url 'mail_detail' pk=1234 %}".replace('1234', email_id);
+  //  $(".card_display_email").click(function(e){
+    //    let e_id = $(this).attr('data-dummy_data');
+      //  if (e_id !== "true"){
+        //    console.log("asdfasdfasdf");
+          //  let get_url = "";
+          //  let email_id = $(this).attr('list_email_id');
+          //  let this_el = $(this);
+            //console.log(email_id)
+          //  {% if email_type == 'draft' %}
+            //    get_url = "{%url 'mail_draft_detail' pk=1234 %}".replace('1234', email_id);
+              //  window.location.href = get_url;
+           // {% else %}
 
-        //console.log(get_url)
+             //   get_url = "{%url 'mail_detail' pk=1234 %}".replace('1234', email_id);
+               // window.location.href = get_url;
+           // {% endif %}
+      //  }else{
+        //    console.log("just display");
+       // }
+    //});
 
-        $.ajax({
-              url: get_url,
-              type: 'GET',
-              //data: $(this).serialize(),
-              success: function (response) {
-               $(this_el).removeClass('bg-dark');
-               // location.reload();
-               console.log("success");
-               $(".app-detail").html(response);
-              },
-              error: function () {
-                 console.log('Error in posting form');
-              },
-              complete: function () {
-              }
-        });
-        {% endif %}
-    });
+     // $(".email_back_button").click(function(){
+       // location.reload();
+     // });
 
       $(".email_back_button").click(function(){
+         get_url = "{%url 'mail_list_class'  %}";
+         window.location.href = get_url;
 
-      location.reload();
       });
 
 
@@ -904,12 +803,6 @@
         $("#email_list_li" + $(this).attr('data-email_id')).click();
 
     });
-
-
-
-
-
-    // $(".compose-quill-editor").find("p").html()
 
 </script>
 

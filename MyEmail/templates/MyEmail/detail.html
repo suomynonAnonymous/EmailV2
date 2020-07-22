@@ -1,8 +1,11 @@
+{%extends 'MyEmail/mail.html'%}
 {%load static%}
+{% block email_detail %}
+<div class="card app-detail">
 <div class="card-header">
     <div class="app-detail-action-left align-items-center">
         <a class="app-detail-close-button btn btn-outline-light mr-3 email_back_button" href="">
-            <i class="ti-arrow-left"></i>
+            <i class="ti-arrow-left detail_back_btn"></i>
         </a>
         <h5 class="mb-0" id="card_content_subject">
             {{ object.mail.subject }}
@@ -52,17 +55,14 @@
                         <i class=" fa fa-star font-size-16 text-warning "></i>
                     </a>
 
-                    <span class="text-muted" id="card_content_viewed_date">{{ object.send_date }}</span>
+                    <span class="text-muted" id="card_content_viewed_date">{{ object.received_date }}</span>
                 </div>
             </div>
 
             <p id="card_content_body">
-                {{ object.mail.body }}
+                {{ object.mail.body|safe }}
             </p>
-
-        </div>
-        <hr class="m-0">
-        <div class="card-body" id="card_attach_div">
+            <div class="card-body" id="card_attach_div">
             <reply_formh6 class="mb-3 font-size-11 text-uppercase">Attached Files</reply_formh6>
             <ul class="list-unstyled mb-0">
                 <li class="small">
@@ -76,9 +76,63 @@
         </div>
 
         <hr class="m-0">
+
+        </div>
+        <hr class="m-0">
+        {% for reply in object.mail.mail_set.all %}
+            <div class="card-body">
+            <div class="d-flex mb-4">
+                <div class="d-flex align-items-center">
+                    <figure class="avatar mr-3">
+                        <img src="{%static "/admin/assets/media/image/user/women_avatar5.jpg"%}"
+                        class="rounded-circle"
+                        alt="image">
+                    </figure>
+                    <div>
+                        <h6 class="m-b-0">
+                        <span class="text-primary"
+                              id="card_content_sender{{reply.pk}}">{{ reply.sender }}</span>
+                            <!--                                            <span class="d-sm-inline d-none text-muted"> &lt;elnora@gmail.com&gt;</span>-->
+                        </h6>
+<!--                        <span class="small text-muted" id="card_content_receiver{{reply.pk}}"></span>-->
+                    </div>
+                </div>
+                <div class="ml-auto">
+                    <a href="#" data-toggle="tooltip" title="Attachment" class="mr-2">
+                        <i class="fa fa-paperclip"></i>
+                    </a>
+                    <a href="#" class="mr-2">
+                        <i class=" fa fa-star font-size-16 text-warning "></i>
+                    </a>
+
+                    <span class="text-muted" id="card_content_viewed_date{{reply.pk}}">{{ reply.created_date }}</span>
+                </div>
+            </div>
+
+            <p id="card_content_body{{reply.pk}}">
+                {{ reply.body|safe }}
+            </p>
+            <div class="card-body" id="card_attach_div{{reply.pk}}">
+            <reply_formh6 class="mb-3 font-size-11 text-uppercase">Attached Files</reply_formh6>
+            <ul class="list-unstyled mb-0">
+                <li class="small">
+                    <a href="" id="card_content_attached_files{{reply.pk}}">
+                        <i data-feather="paperclip" class="mr-1 width-15 height-15"></i>
+                        uikit-design.psd
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <hr class="m-0">
+        </div>
+        <hr class="m-0">
+        {% endfor %}
+
         <div class="card-body">
             <h6 class="mb-3 font-size-11 text-uppercase">Reply</h6>
-            <form method="POST" action="" id="reply_form" enctype="multipart/form-data">
+            <form method="POST" action="{% url 'reply_create_class' object.mail.pk %}" id="reply_form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="reply-email-quill-editor mb-3"></div>
                 <div class="d-flex justify-content-between">
@@ -93,17 +147,13 @@
                     </div>
 
                     <input type="hidden" name="body" id="reply_body">
+                    <input type="hidden" name="subject" value="&lt reply &gt {{object.mail.subject}}" id="reply_subject">
+                    <input type="hidden" name="sender" value="{{object.mail.sender.pk}}" id="reply_sender">
                     <button type="submit" class="btn btn-primary">Send</button>
 
                 </div>
             </form>
         </div>
     </div>
-
-<script>
-    $(".email_back_button").click(function(){
-
-      location.reload();
-      });
-
-</script>
+</div>
+{% endblock %}
