@@ -45,6 +45,17 @@
                        value="{{ object.subject }}"
                        placeholder="Subject" required>
             </div>
+            <div class="form-group">
+                <select name="label" class="form-control select2-example">
+                    {%for label in label_list%}
+                            <option value="{{label.0}}"
+
+                            >{{label.1}}
+
+                            </option>
+                    {%endfor%}
+                </select>
+            </div>
 
             <div class="form-group">
                 <div class="custom-file">

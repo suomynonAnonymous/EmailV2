@@ -31,7 +31,7 @@
                         <a href="{% url 'mail_draft_class' %}?email_type=send"
 
                            class="list-group-item
-                            {% if 'send' in request.get_full_path %}
+                            {% if '?email_type=send' in request.get_full_path %}
                             active
                             {% endif %} ">
                             <i class="ti-check list-group-icon mr-2 text-success" ></i>Send
@@ -39,7 +39,7 @@
                         </a>
                         <a href="{% url 'mail_draft_class' %}?email_type=draft"
                            class="list-group-item
-                             {% if 'draft' in request.get_full_path %}
+                             {% if '?email_type=draft' in request.get_full_path %}
                             active
                             {% endif %} ">
 
@@ -78,27 +78,43 @@
                         <h6 class="mb-0">Labels</h6>
                     </div>
                     <div class="list-group list-group-flush">
+                        {%for label in label_list%}
                         <a href="#" class="list-group-item d-flex align-items-center">
-                            <span class="text-warning fa fa-circle mr-2"></span>
-                            Theme Support
-                            <span class="small ml-auto">5</span>
+                            <span
+                            {%if label.0 == 'SP' %}
+                              class="text-warning
+                                  {%endif%}
+                            {%if label.0 == 'AS' %}
+                              class="text-success
+                                  {%endif%}
+                            {%if label.0 == 'EX' %}
+                              class="text-info
+                                  {%endif%}
+                            {%if label.0 == 'PR' %}
+                              class="text-danger
+                                  {%endif%}
+
+                                    fa fa-circle mr-2">  </span>
+                                {{label.1}}
+                            <span class="small ml-auto"></span>
                         </a>
-                        <a href="#" class="list-group-item d-flex align-items-center">
-                            <span class="text-success fa fa-circle mr-2"></span>
-                            Freelance
-                        </a>
-                        <a href="#" class="list-group-item d-flex align-items-center">
-                            <span class="text-danger fa fa-circle mr-2"></span>
-                            Social
-                        </a>
-                        <a href="#" class="list-group-item d-flex align-items-center">
-                            <span class="text-info fa fa-circle mr-2"></span>
-                            Friends
-                        </a>
-                        <a href="#" class="list-group-item d-flex align-items-center">
-                            <span class="text-secondary fa fa-circle mr-2"></span>
-                            Coding
-                        </a>
+                        {%endfor%}
+<!--                        <a href="#" class="list-group-item d-flex align-items-center">-->
+<!--                            <span class="text-success fa fa-circle mr-2"></span>-->
+<!--                            Freelance-->
+<!--                        </a>-->
+<!--                        <a href="#" class="list-group-item d-flex align-items-center">-->
+<!--                            <span class="text-danger fa fa-circle mr-2"></span>-->
+<!--                            Social-->
+<!--                        </a>-->
+<!--                        <a href="#" class="list-group-item d-flex align-items-center">-->
+<!--                            <span class="text-info fa fa-circle mr-2"></span>-->
+<!--                            Friends-->
+<!--                        </a>-->
+<!--                        <a href="#" class="list-group-item d-flex align-items-center">-->
+<!--                            <span class="text-secondary fa fa-circle mr-2"></span>-->
+<!--                            Coding-->
+<!--                        </a>-->
                     </div>
                 </div>
             </div>
@@ -211,7 +227,22 @@
                                 </form>
 <!--                                <a class="dropdown-item" href="#">Subject</a>-->
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">Size</a>
+                                <form {% if email_type == "draft" %}
+                                      action="{% url 'mail_draft_class' %}"
+                                                {%else%}
+                                        action="{% url 'mail_list_class' %}"
+                                                {%endif%} >
+                                    <input type="hidden" name="filter" value="UnRead">
+                                    <input type="hidden" name="email_type" value="{{email_type}}">
+                                    <button class="dropdown-item
+                                         {%if 'UnRead' in request.get_full_path%}
+                                    active
+                                    {%endif%}" type="submit">Unseen</button>
+                                </form>
+
+
+
+<!--                                <a class="dropdown-item" href="#">Size</a>-->
                             </div>
                         </li>
                     </ul>
@@ -309,19 +340,38 @@
                                         </div>
                                     </div>
                                     <div>
-                                       <a href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}"
-                                           class="add-star mr-3"
 
-                                   title="Add stars">
-                                    <i class="fa font-size-16
-                                    {%if email.mail_starred%}
-                                        text-warning
-                                        fa-star
-                                    {% else %}
-                                        fa-star-o
-                                    {%endif%}
-                                    "></i>
-                                        </a>
+                                        {% if '?email_type=send'  in request.get_full_path %}
+
+                                            <a href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}"
+                                            class="add-star mr-3"
+                                            title="Add stars">
+                                            <i class="fa font-size-16
+                                                {%if email.sender_starred%}
+                                                    text-warning
+                                                    fa-star
+                                                {% else %}
+                                                    fa-star-o
+                                                {%endif%}
+                                                    "></i>
+                                            </a>
+
+                                        {%else%}
+
+                                            <a href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}"
+                                            class="add-star mr-3"
+                                            title="Add stars">
+                                            <i class="fa font-size-16
+                                                {%if email.mail_starred%}
+                                                    text-warning
+                                                    fa-star
+                                                {% else %}
+                                                    fa-star-o
+                                                {%endif%}
+                                                    "></i>
+                                            </a>
+                                        {%endif%}
+
                                     </div>
                                     <div>
                                         <figure class="avatar avatar-sm mr-3">
@@ -376,6 +426,10 @@
                                                         <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
                                                     </div>
                                                 </div>
+
+
+
+
                                             </div>
                                         </div>
                                         <div class="text-muted d-flex justify-content-between">
@@ -471,12 +525,19 @@
                         <div class="form-group">
                             <input type="text" class="form-control" name = "subject" placeholder="Subject" required>
                         </div>
+                        <div class="form-group">
+                         <select name="label" class="form-control select2-example">
+                                {%for label in label_list%}
+                                <option value="{{label.0}}">{{label.1}}
 
+                                        </option>
+                            {%endfor%}
+                            </select>
+                        </div>
                         <div class="form-group">
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" name = "file" multiple id="customFileLangHTML">
-                                <label class="custom-file-label" for="customFileLangHTML" data-browse="Select files">Voeg
-                                    je document toe</label>
+                                <label class="custom-file-label" for="customFileLangHTML" data-browse="Select files"> ... </label>
                             </div>
                         </div>
                         <div>
@@ -593,12 +654,20 @@
         {% if "mail_detail" in request.get_full_path %}
             $(".card_display_email").click();
         {% endif %}
+
+        {% if "send_detail" in request.get_full_path %}
+            $(".card_display_email").click();
+        {% endif %}
     });
 
+
+    // Select-2 Multiple Select
     $(".select2-example").select2({
         placeholder: 'Select'
     });
 
+
+        // Email-Compose
     $("#email_submit_form").submit(function(){
         //$("#input_body").html($(".compose-quill-editor").find("p").html());
         $("#input_body").html($(".compose-quill-editor").find(".ql-editor").html());
@@ -609,6 +678,9 @@
         $("#receiver_list").val($("#receiver_multiple").val());
     });
 
+
+
+        // Draft Display Form & Send Email
     $("#draft_submit_form").submit(function(){
         //$("#input_body_draft").html($(".quill_draft").find("p").html());
         $("#input_body_draft").html($(".quill_draft").find(".ql-editor").html());
@@ -618,6 +690,8 @@
         $("#email_submit_form").attr('action',url_send);
         $("#receiver_list_draft").val($("#receiver_multiple_draft").val());
     });
+
+
 
     // ///reply:
     $("#reply_form").submit(function(e){
@@ -630,11 +704,20 @@
         $("#receiver_list").val($("#receiver_multiple").val());
     });
 
+
+
+
+    // Creating Draft from Compose Save Button
     $("#draft_email_create").click(function(){
         let url_send = "{% url 'draft_create_class' %}";
         $("#email_submit_form").attr('action',url_send);
         $("#email_submit_form").submit();
     });
+
+
+
+
+
 
     // Email Detailed View
     //$(".card_display_email").click(function(){
@@ -684,22 +767,25 @@
 
     //});
 
+
+
+
+
+
+
     // Mark As Viewed On Click Email
     $(".card_display_email").click(function(){
         let get_url = "";
         let email_id = $(this).attr('list_email_id');
         let this_el = $(this);
-        //console.log(email_id)
         get_url = "{%url 'mail_viewed' pk=1234 %}".replace('1234', email_id);
-        //console.log(get_url)
+
         $.ajax({
               url: get_url,
               type: 'GET',
-              //data: $(this).serialize(),
               success: function (response) {
-               $(this_el).removeClass('bg-dark');
-               // location.reload();
-               console.log("success!!");
+                    $(this_el).removeClass('bg-dark');
+              console.log("success!!");
               },
               error: function () {
                  console.log('Error in posting form');
@@ -710,31 +796,41 @@
 
     });
 
-  //  $(".card_display_email").click(function(e){
-    //    let e_id = $(this).attr('data-dummy_data');
-      //  if (e_id !== "true"){
-        //    console.log("asdfasdfasdf");
-          //  let get_url = "";
-          //  let email_id = $(this).attr('list_email_id');
-          //  let this_el = $(this);
-            //console.log(email_id)
-          //  {% if email_type == 'draft' %}
-            //    get_url = "{%url 'mail_draft_detail' pk=1234 %}".replace('1234', email_id);
-              //  window.location.href = get_url;
-           // {% else %}
 
-             //   get_url = "{%url 'mail_detail' pk=1234 %}".replace('1234', email_id);
-               // window.location.href = get_url;
-           // {% endif %}
-      //  }else{
-        //    console.log("just display");
-       // }
-    //});
+
+    // Mail Detail View And Draft View upon clicking Mail-List
+   $(".card_display_email").click(function(e){
+        let e_id = $(this).attr('data-dummy_data');
+        if (e_id !== "true" && $(e.target).is("li")){
+        //    console.log("asdfasdfasdf");
+        let get_url = "";
+        let email_id = $(this).attr('list_email_id');
+        let this_el = $(this);
+        //console.log(email_id)
+         {% if email_type == 'draft' %}
+            get_url = "{%url 'mail_draft_detail' pk=1234 %}".replace('1234', email_id);
+            window.location.href = get_url;
+          {% elif email_type == 'send' %}
+            get_url = "{%url 'send_detail' pk=1234 %}".replace('1234', email_id);
+            window.location.href = get_url;
+         {% else %}
+             get_url = "{%url 'mail_detail' pk=1234 %}".replace('1234', email_id);
+             window.location.href = get_url;
+         {% endif %}
+       }
+       else{
+          console.log("just display");
+       }
+    });
+
+
 
      // $(".email_back_button").click(function(){
        // location.reload();
      // });
 
+
+        // Re-load Back on clicking Back Button //
       $(".email_back_button").click(function(){
          get_url = "{%url 'mail_list_class'  %}";
          window.location.href = get_url;
@@ -743,7 +839,7 @@
 
 
 
-    // With Selected
+    // With Selected Marking Email-Type
 
     $(".email_status_select").click(function(){
 
@@ -761,7 +857,11 @@
                 get_url = "{% url 'mail_spam' pk=1234 %}".replace('1234', email_id);
             }
             if (status === "delete"){
-                get_url = "{% url 'mail_deleted' pk=1234 %}".replace('1234', email_id);
+                    {% if '?email_type=send' in request.get_full_path  %}
+                        get_url = "{% url 'sender_delete' pk=1234 %}".replace('1234', email_id);
+                    {%else%}
+                        get_url = "{% url 'mail_deleted' pk=1234 %}".replace('1234', email_id);
+                    {%endif%}
             }
             if (status === "unread"){
                 get_url = "{% url 'mail_unread' pk=1234 %}".replace('1234', email_id);

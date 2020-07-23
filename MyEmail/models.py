@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-LABEL_CHOICES = (('SP', 'Support'), ('AS', 'Assignment'), ('EX', 'Examination'),
-                 ('PR', 'Practical'))
-
 
 class Mail(models.Model):
+    LABEL_CHOICES = (('SP', 'Support'), ('AS', 'Assignment'), ('EX', 'Examination'),
+                     ('PR', 'Practical'))
+    LABEL_CLASSES = (('SC','text-success'), ('WR','text-warning'), ('DN', 'text-danger'), ('IN', 'text-info'), ('SC', 'text-secondary'))
     subject = models.CharField(max_length=100, blank=True, null=True)
     label = models.CharField(max_length=2, choices=LABEL_CHOICES, blank=True, null=True)
     body = models.TextField(blank=True, null=True)
