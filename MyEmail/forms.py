@@ -19,3 +19,10 @@ class MailForm(ModelForm):
     class Meta:
         model = Mail
         fields = "__all__"
+
+
+class ReplyForm(ModelForm):
+    class Meta:
+        model = Mail
+        fields = "__all__"
+        exclude = ['label']

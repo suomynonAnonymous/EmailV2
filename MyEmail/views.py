@@ -5,7 +5,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 
-from .forms import DraftUpdateForm, MailReceiverForm, MailForm
+from .forms import DraftUpdateForm, MailReceiverForm, MailForm, ReplyForm
 from .models import Mail, MailReceiver
 
 
@@ -90,7 +90,6 @@ class MailListView(ListView):
         context = super().get_context_data()
         context['user_list'] = User.objects.all()
         context['label_list'] = Mail.LABEL_CHOICES
-        context['label_class'] = Mail.LABEL_CLASSES
         context['email_type'] = self.request.GET.get('email_type', "inbox")
         context['inbox_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_deleted=False,
                                                              mail_spam=False, mail_viewed=False).count()
@@ -115,9 +114,13 @@ class MailMultipleCreate(View):
             r_list = receiver_list.split(',')
 
         for r in r_list:
-            mail_form = MailReceiverForm(request.POST, request.FILES)
-            mail_obj = mail_form.save(commit=False)
-            mail_obj.mail_send = True
+            # required if receiver null = True, blank = True
+
+            # mail_form = MailReceiverForm(request.POST, request.FILES)
+            # mail_obj = mail_form.save(commit=False)
+
+            # if Receiver is not blank and null then,
+            mail_obj = MailReceiver()
             receiver = User.objects.get(pk=int(r))
             mail_obj.receiver = receiver
             mail_obj.mail = m_obj
@@ -149,7 +152,7 @@ class DraftCreateView(CreateView):
 class ReplyCreateView(CreateView):
     model = Mail
     template_name = "MyEmail/mail.html"
-    form_class = MailForm
+    form_class = ReplyForm
     success_url = reverse_lazy('mail_list_class')
 
     def form_invalid(self, form):
@@ -160,7 +163,8 @@ class ReplyCreateView(CreateView):
     def form_valid(self, form):
         self.success_url = self.success_url + "?email_type=inbox"
         r = super().form_valid(form)
-        self.object.reply_to = get_object_or_404(Mail, pk=self.kwargs['pk'])
+        # already mentioned in form field detail.html and send_detail.html
+        # self.object.reply_to = get_object_or_404(Mail, pk=self.kwargs['pk'])
         self.object.save()
         return r
 
@@ -297,3 +301,4 @@ def sender_delete(request, pk):
     mail.save()
     email_type = request.GET.get('email_type', "")
     return redirect(reverse('mail_draft_class') + '?email_type=' + email_type)
+

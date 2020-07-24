@@ -10,8 +10,51 @@
         <h5 class="mb-0" id="card_content_subject">
             {{ object.subject }}
         </h5>
-        <span class="badge bg-success-bright text-success ml-1" id="card_content_label">
-            {{ object.get_label_display }}</span>
+
+
+        {% if object.label%}
+
+         <span
+            {%if object.label == 'GR' %}
+               class="badge bg-whatsapp  ml-1"
+           {%endif%}
+
+           {%if object.label == 'AS' %}
+               class="badge bg-success  ml-1"
+           {%endif%}
+
+
+
+            {% if object.label == 'SP' %}
+               class="badge  bg-warning ml-1"
+            {%endif%}
+
+
+            {%if object.label == 'EX' %}
+              class="badge  bg-info  ml-1"
+            {%endif%}
+
+
+            {% if object.label == 'PR'%}
+               class="badge bg-danger  ml-1"
+            {%endif%}
+
+
+        id="card_content_label">
+
+               {{ object.get_label_display }}
+
+
+
+        </span>
+        {%else%}
+
+        {%endif%}
+
+
+
+
+
     </div>
     <div class="app-detail-action-right">
         <div>
@@ -41,7 +84,7 @@
                     <div>
                         <h6 class="m-b-0">
                         <span class="text-primary"
-                              id="card_content_sender">{{ object.sender }}</span>
+                              id="card_content_sender">From:{{ object.sender }} &lt  {{ object.sender.email}} &gt</span>
                             <!--                                            <span class="d-sm-inline d-none text-muted"> &lt;elnora@gmail.com&gt;</span>-->
                         </h6>
 <!--                        <span class="small text-muted" id="card_content_receiver">{{ object.receiver }}</span>-->
@@ -62,14 +105,14 @@
             <p id="card_content_body">
                 {{ object.body|safe }}
             </p>
-            {%if object.file%}
+            {%if object.attachhment%}
              <div class="card-body" id="card_attach_div">
                 <reply_formh6 class="mb-3 font-size-11 text-uppercase">Attached Files</reply_formh6>
                 <ul class="list-unstyled mb-0">
                     <li class="small">
                         <a href="" id="card_content_attached_files">
                             <i data-feather="paperclip" class="mr-1 width-15 height-15"></i>
-                            {{ object.file.name}}
+                            {{ object.attachment.name}}
                         </a>
                     </li>
 
@@ -93,7 +136,7 @@
                     <div>
                         <h6 class="m-b-0">
                         <span class="text-primary"
-                              id="card_content_sender{{reply.pk}}">{{ reply.sender }}</span>
+                              id="card_content_sender{{reply.pk}}">From:{{ reply.sender }} &lt {{ reply.sender.email}} &gt</span>
                             <!--                                            <span class="d-sm-inline d-none text-muted"> &lt;elnora@gmail.com&gt;</span>-->
                         </h6>
 <!--                        <span class="small text-muted" id="card_content_receiver{{reply.pk}}"></span>-->
@@ -116,14 +159,14 @@
                 {{ reply.body|safe }}
             </p>
 
-                {%if reply.file%}
+                {%if reply.attachment%}
             <div class="card-body" id="card_attach_div{{reply.pk}}">
                 <reply_formh6 class="mb-3 font-size-11 text-uppercase">Attached Files</reply_formh6>
                     <ul class="list-unstyled mb-0">
                         <li class="small">
                             <a href="" id="card_content_attached_files{{reply.pk}}">
                                 <i data-feather="paperclip" class="mr-1 width-15 height-15"></i>
-                                {{ reply.file.url}}
+                                {{ reply.attachment.url}}
                             </a>
                         </li>
 
@@ -135,10 +178,10 @@
         </div>
         <hr class="m-0">
         {% endfor %}
-
+<!--   #      object.pk -->
         <div class="card-body">
             <h6 class="mb-3 font-size-11 text-uppercase">Reply</h6>
-            <form method="POST" action="{% url 'reply_create_class' object.pk %}" id="reply_form" enctype="multipart/form-data">
+            <form method="POST" action="{% url 'reply_create_class'%}" id="reply_form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="reply-email-quill-editor mb-3"></div>
                 <div class="d-flex justify-content-between">
@@ -155,6 +198,10 @@
                     <input type="hidden" name="body" id="reply_body">
                     <input type="hidden" name="subject" value="&lt reply &gt {{object.mail.subject}}" id="reply_subject">
                     <input type="hidden" name="sender" value="{{request.user.pk}}" id="reply_sender">
+                    <input type="hidden" name="reply_to" value="{{object.pk}}" id="reply_to">
+
+
+
                     <button type="submit" class="btn btn-primary">Send</button>
 
                 </div>
