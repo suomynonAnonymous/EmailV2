@@ -63,7 +63,8 @@ class MailListView(ListView):
         if email_type == "inbox":
             queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=False))
         if email_type == "starred":
-            queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_starred=True) & Q(mail_spam=False))
+            queryset = queryset.filter(
+                Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_starred=True) & Q(mail_spam=False))
         if email_type == "spam":
             queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=True))
         if email_type == "trash":
@@ -205,6 +206,11 @@ class DraftUpdateView(UpdateView):
 class MailDetailView(DetailView):
     model = MailReceiver
     template_name = "MyEmail/detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['label_list'] = Mail.LABEL_CHOICES
+        return context
 
 
 class SendDetailView(DetailView):

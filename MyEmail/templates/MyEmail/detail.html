@@ -10,8 +10,44 @@
         <h5 class="mb-0" id="card_content_subject">
             {{ object.mail.subject }}
         </h5>
-        <span class="badge bg-success-bright text-success ml-1" id="card_content_label">
-            {{ object.mail.get_label_display }}</span>
+
+        {% if object.mail.label%}
+
+         <span
+
+
+           {%if object.mail.label == 'AS' %}
+               class="badge bg-success  ml-1"
+           {%endif%}
+
+
+
+            {% if object.mail.label == 'SP' %}
+               class="badge  bg-warning ml-1"
+            {%endif%}
+
+
+            {%if object.mail.label == 'EX' %}
+              class="badge  bg-info  ml-1"
+            {%endif%}
+
+
+            {% if object.mail.label == 'PR'%}
+               class="badge bg-danger  ml-1"
+            {%endif%}
+
+
+        id="card_content_label">
+
+               {{ object.mail.get_label_display }}
+
+
+
+        </span>
+        {%else%}
+
+        {%endif%}
+
     </div>
     <div class="app-detail-action-right">
         <div>
@@ -154,7 +190,7 @@
 
                     <input type="hidden" name="body" id="reply_body">
                     <input type="hidden" name="subject" value="&lt reply &gt {{object.mail.subject}}" id="reply_subject">
-                    <input type="hidden" name="sender" value="{{object.mail.sender.pk}}" id="reply_sender">
+                    <input type="hidden" name="sender" value="{{request.user.pk}}" id="reply_sender">
                     <button type="submit" class="btn btn-primary">Send</button>
 
                 </div>

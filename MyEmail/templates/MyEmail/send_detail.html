@@ -154,7 +154,7 @@
 
                     <input type="hidden" name="body" id="reply_body">
                     <input type="hidden" name="subject" value="&lt reply &gt {{object.mail.subject}}" id="reply_subject">
-                    <input type="hidden" name="sender" value="{{object.mail.sender.pk}}" id="reply_sender">
+                    <input type="hidden" name="sender" value="{{request.user.pk}}" id="reply_sender">
                     <button type="submit" class="btn btn-primary">Send</button>
 
                 </div>

@@ -20,7 +20,7 @@
 
                            class="list-group-item
                            {% if 'inbox' in request.get_full_path %}
-                            active
+                             bg-dark
                             {% endif %}
                            d-flex align-items-center">
                             <i class="ti-email list-group-icon mr-2 text-primary"></i>
@@ -32,7 +32,7 @@
 
                            class="list-group-item
                             {% if '?email_type=send' in request.get_full_path %}
-                            active
+                            bg-dark
                             {% endif %} ">
                             <i class="ti-check list-group-icon mr-2 text-success" ></i>Send
 
@@ -40,7 +40,7 @@
                         <a href="{% url 'mail_draft_class' %}?email_type=draft"
                            class="list-group-item
                              {% if '?email_type=draft' in request.get_full_path %}
-                            active
+                            bg-dark
                             {% endif %} ">
 
                             <i class="ti-pencil-alt list-group-icon mr-2 text-secondary"></i>Draft
@@ -49,7 +49,7 @@
                         <a href="{% url 'mail_list_class' %}?email_type=starred"
                            class="list-group-item d-flex align-items-center
                             {% if 'starred' in request.get_full_path%}
-                            active
+                            bg-dark
                             {% endif %} ">
 
                                     <i class="mr-2 fa fa-star text-warning"></i>Starred
@@ -59,7 +59,7 @@
                         <a href="{% url 'mail_list_class' %}?email_type=spam"
                            class="list-group-item
                             {% if 'spam' in request.get_full_path %}
-                            active
+                            bg-dark
                             {% endif %} ">
 
                             <i class="ti-info-alt list-group-icon mr-2 text-danger"></i>Spam
@@ -68,7 +68,7 @@
                         <a href="{% url 'mail_list_class' %}?email_type=trash"
                            class="list-group-item d-flex align-items-center
                              {% if 'trash' in request.get_full_path %}
-                            active
+                            bg-dark
                             {% endif %} ">
                             <i class="ti-trash list-group-icon mr-2 text-danger"></i>Trash
                             <span class="small ml-auto">{{ trash_count }}</span>
@@ -797,11 +797,11 @@
     });
 
 
-
+ // && $(e.target).is("li")
     // Mail Detail View And Draft View upon clicking Mail-List
    $(".card_display_email").click(function(e){
         let e_id = $(this).attr('data-dummy_data');
-        if (e_id !== "true" && $(e.target).is("li")){
+        if (e_id !== "true"){
         //    console.log("asdfasdfasdf");
         let get_url = "";
         let email_id = $(this).attr('list_email_id');
