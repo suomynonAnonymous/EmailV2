@@ -410,24 +410,43 @@
                                                         <i class="fa fa-ellipsis-h"></i>
                                                     </a>
                                                     <div class="dropdown-menu dropdown-menu-right ">
-                                                        <a class="dropdown-item reply_view" id="reply_view{{ email.pk }}"
-                                                           data-email_id="{{ email.pk }}"
-                                                           href="#">Reply</a>
-                                                        <a class="dropdown-item" href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">
-                                                            {%if email.mail_starred%}
-                                                                Remove Star
-                                                            {%else%}
-                                                            Add star
-                                                            {%endif%}</a>
-                                                        <a class="dropdown-item" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">
-                                                            {%if email.mail_spam%}
-                                                                Unmark as Spam
-                                                            {%else%}
-                                                            Mark as Spam
-                                                            {%endif%}
-                                                            </a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
+
+                                                        {% if '?email_type=inbox' in request.get_full_path%}
+                                                 <a class="dropdown-item reply_view text-info" id="reply_view{{ email.pk }}"data-email_id="{{ email.pk }}"href="#">Reply</a>
+                                                 <a class="dropdown-item text-warning" href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">
+                                                 {%if email.mail_starred%}Remove Star{%else%} Add star {%endif%}</a>
+                                                 <a class="dropdown-item text-danger" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Mark as Spam </a>
+                                                 <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}"> Delete  </a>
+                                                        {%endif%}
+
+
+                                                        {% if '?email_type=send' in request.get_full_path%}
+                                              <a class="dropdown-item text-danger"href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}"> Delete </a>
+                                              <a class="dropdown-item text-warning" href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}">
+                                               {%if email.sender_starred%}Remove Star {%else%} Add star {%endif%}</a>
+                                                       {%endif%}
+
+                                                {%if '?email_type=draft' in request.get_full_path%}
+                                                <a class="dropdown-item text-danger"href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}">Delete</a>
+                                                {%endif%}
+
+                                                {%if '?email_type=starred' in request.get_full_path%}
+                                                 <a class="dropdown-item text-info" href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">Remove Star</a>
+                                                 <a class="dropdown-item text-warning" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Mark as Spam</a>
+                                                 <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
+                                                {%endif%}
+
+                                                {%if '?email_type=spam' in request.get_full_path%}
+                                              <a class="dropdown-item text-success" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Unmark as Spam</a>
+                                              <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
+                                                {%endif%}
+
+                                                {% if '?email_type=trash' in request.get_full_path%}
+                                                <a class="dropdown-item text-success"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Recover Email</a>
+                                                <a class="dropdown-item text-danger"href="">Empty Trash</a>
+                                                  {%endif%}
+
+
                                                     </div>
                                                 </div>
 
