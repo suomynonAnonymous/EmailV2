@@ -105,14 +105,14 @@
             <p id="card_content_body">
                 {{ object.body|safe }}
             </p>
-            {%if object.attachhment%}
+            {%if object.attachment%}
              <div class="card-body" id="card_attach_div">
                 <reply_formh6 class="mb-3 font-size-11 text-uppercase">Attached Files</reply_formh6>
                 <ul class="list-unstyled mb-0">
                     <li class="small">
-                        <a href="" id="card_content_attached_files">
+                        <a href="{{ MEDIA_URL }}{{ object.attachment.url }}" id="card_content_attached_files">
                             <i data-feather="paperclip" class="mr-1 width-15 height-15"></i>
-                            {{ object.attachment.name}}
+                             {{ object.get_file_upload_name }}
                         </a>
                     </li>
 
@@ -164,9 +164,9 @@
                 <reply_formh6 class="mb-3 font-size-11 text-uppercase">Attached Files</reply_formh6>
                     <ul class="list-unstyled mb-0">
                         <li class="small">
-                            <a href="" id="card_content_attached_files{{reply.pk}}">
+                            <a href="{{ MEDIA_URL }}{{ reply.attachment.url }}" id="card_content_attached_files{{reply.pk}}">
                                 <i data-feather="paperclip" class="mr-1 width-15 height-15"></i>
-                                {{ reply.attachment.url}}
+                                {{ reply.get_file_upload_name}}
                             </a>
                         </li>
 

@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -24,6 +26,12 @@ class Mail(models.Model):
     def __str__(self):
         return self.subject + '--' + self.sender.username
 
+    def get_file_upload_name(self):
+        if self.attachment:
+            return os.path.split(self.attachment.name)[1]
+        else:
+            return ""
+
 
 class MailReceiver(models.Model):
     received_date = models.DateTimeField(auto_now_add=True)
@@ -37,9 +45,10 @@ class MailReceiver(models.Model):
     mail = models.ForeignKey(Mail, on_delete=models.CASCADE)
 
     def __str__(self):
-        rec = self.receiver.username if self.receiver else "None"
-        sen = "None"
-        if self.mail:
-            if self.mail.sender:
-                sen = self.mail.sender.username
-        return self.mail.subject + '--' + sen + '--' + rec
+        return self.mail.subject + '--' + self.mail.sender.username + '--' + self.receiver.username
+
+    def get_file_upload_name(self):
+        if self.mail.attachment:
+            return os.path.split(self.mail.attachment.name)[1]
+        else:
+            return ""

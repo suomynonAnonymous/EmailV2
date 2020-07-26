@@ -39,7 +39,7 @@ class MailDraftView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['user_list'] = User.objects.all()
+        context['user_list'] = User.objects.all().exclude(id=self.request.user.id)
         context['label_list'] = Mail.LABEL_CHOICES
         context['email_type'] = self.request.GET.get('email_type', "send")
         context['inbox_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_deleted=False,
@@ -48,6 +48,22 @@ class MailDraftView(ListView):
         context['trash_count'] = MailReceiver.objects.filter(mail_deleted=True).count()
         context['search_q'] = self.request.GET.get('search', '')
         context['filter'] = self.request.GET.get('filter', '')
+        context['general_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                     mail_deleted=False, mail_spam=False,
+                                                                     mail__label='GR').count()
+        context['support_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                     mail_deleted=False, mail_spam=False,
+                                                                     mail__label='SP').count()
+        context['assignment_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                        mail_deleted=False, mail_spam=False,
+                                                                        mail__label='AS').count()
+        context['exam_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                  mail_deleted=False, mail_spam=False,
+                                                                  mail__label='EX').count()
+        context['practical_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                       mail_deleted=False, mail_spam=False,
+                                                                       mail__label='PR').count()
+
         return context
 
 
@@ -70,6 +86,17 @@ class MailListView(ListView):
         if email_type == "trash":
             queryset = queryset.filter(Q(receiver=self.request.user) | Q(mail__sender=self.request.user))
             queryset = queryset.filter(mail_deleted=True)
+        queryset = queryset.filter(receiver=self.request.user)
+        if email_type == "general":
+            queryset = queryset.filter(mail__label='GR')
+        if email_type == "support":
+            queryset = queryset.filter(mail__label='SP')
+        if email_type == "assignment":
+            queryset = queryset.filter(mail__label='AS')
+        if email_type == "exam":
+            queryset = queryset.filter(mail__label='EX')
+        if email_type == "practical":
+            queryset = queryset.filter(mail__label='PR')
 
         search = self.request.GET.get('search', "")
         queryset = queryset.filter(Q(mail__sender__username__icontains=search) | Q(mail__body__icontains=search) | Q(
@@ -88,7 +115,7 @@ class MailListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['user_list'] = User.objects.all()
+        context['user_list'] = User.objects.all().exclude(id=self.request.user.id)
         context['label_list'] = Mail.LABEL_CHOICES
         context['email_type'] = self.request.GET.get('email_type', "inbox")
         context['inbox_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_deleted=False,
@@ -98,7 +125,21 @@ class MailListView(ListView):
         context['trash_count'] = MailReceiver.objects.filter(mail_deleted=True, receiver=self.request.user).count()
         context['search_q'] = self.request.GET.get('search', '')
         context['filter'] = self.request.GET.get('filter', '')
-        print('label:', context['label_list'])
+        context['general_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                     mail_deleted=False, mail_spam=False,
+                                                                     mail__label='GR').count()
+        context['support_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                     mail_deleted=False, mail_spam=False,
+                                                                     mail__label='SP').count()
+        context['assignment_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                        mail_deleted=False, mail_spam=False,
+                                                                        mail__label='AS').count()
+        context['exam_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                  mail_deleted=False, mail_spam=False,
+                                                                  mail__label='EX').count()
+        context['practical_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                       mail_deleted=False, mail_spam=False,
+                                                                       mail__label='PR').count()
         return context
 
 
@@ -177,7 +218,7 @@ class DraftUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['user_list'] = User.objects.all()
+        context['user_list'] = User.objects.all().exclude(id=self.request.user.id)
         context['label_list'] = Mail.LABEL_CHOICES
 
         return context
@@ -301,4 +342,3 @@ def sender_delete(request, pk):
     mail.save()
     email_type = request.GET.get('email_type', "")
     return redirect(reverse('mail_draft_class') + '?email_type=' + email_type)
-
