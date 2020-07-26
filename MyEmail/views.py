@@ -22,7 +22,13 @@ class MailDraftView(ListView):
             queryset = queryset.filter(sender_delete=False, mail_draft=False)
         if email_type == "draft":
             queryset = queryset.filter(sender=self.request.user)
-            queryset = queryset.filter(mail_draft=True)
+            queryset = queryset.filter(mail_draft=True, sender_delete=False)
+        if email_type == "trash_sender":
+            queryset = queryset.filter(sender=self.request.user, reply_to__isnull=True, sender_delete=True)
+
+        if email_type == "starred_sender":
+            queryset = queryset.filter(sender=self.request.user, reply_to__isnull=True, sender_delete=False,
+                                       sender_starred=True)
 
         search = self.request.GET.get('search', "")
         queryset = queryset.filter(Q(sender__username__icontains=search) | Q(body__icontains=search) | Q(
@@ -78,12 +84,12 @@ class MailListView(ListView):
         email_type = self.request.GET.get('email_type', "inbox")
         if email_type == "inbox":
             queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=False))
-        if email_type == "starred":
+        if email_type == "starred_inbox":
             queryset = queryset.filter(
                 Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_starred=True) & Q(mail_spam=False))
         if email_type == "spam":
             queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=True))
-        if email_type == "trash":
+        if email_type == "delete":
             queryset = queryset.filter(Q(receiver=self.request.user) | Q(mail__sender=self.request.user))
             queryset = queryset.filter(mail_deleted=True)
         queryset = queryset.filter(receiver=self.request.user)

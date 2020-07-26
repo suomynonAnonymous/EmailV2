@@ -19,7 +19,7 @@
                         <a href="{% url 'mail_list_class' %}?email_type=inbox"
 
                            class="list-group-item
-                           {% if 'inbox' in request.get_full_path %}
+                           {% if '?email_type=inbox' in request.get_full_path %}
                              bg-dark
                             {% endif %}
                            d-flex align-items-center">
@@ -46,15 +46,25 @@
                             <i class="ti-pencil-alt list-group-icon mr-2 text-secondary"></i>Draft
                         </a>
 
-                        <a href="{% url 'mail_list_class' %}?email_type=starred"
+                        <a href="{% url 'mail_list_class' %}?email_type=starred_inbox"
                            class="list-group-item d-flex align-items-center
-                            {% if 'starred' in request.get_full_path%}
+                            {% if '?email_type=starred_inbox' in request.get_full_path%}
                             bg-dark
                             {% endif %} ">
+                            <i class="mr-2 fa fa-star text-warning"></i>Starred
+                            <span class="small ml-auto">{{ starred_count }}</span>
+                        </a>
 
-                                    <i class="mr-2 fa fa-star text-warning"></i>Starred
-                                    <span class="small ml-auto">{{ starred_count }}</span>
-                                </a>
+
+                         <a href="{% url 'mail_draft_class' %}?email_type=starred_sender"
+                           class="list-group-item d-flex align-items-center
+                             {% if '?email_type=starred_sender' in request.get_full_path %}
+                            bg-dark
+                            {% endif %} ">
+                            <i class="mr-2 fa fa-star text-warning"></i>Send Starred
+                            <span class="small ml-auto"></span>
+                        </a>
+
 
                         <a href="{% url 'mail_list_class' %}?email_type=spam"
                            class="list-group-item
@@ -65,14 +75,33 @@
                             <i class="ti-info-alt list-group-icon mr-2 text-danger"></i>Spam
                         </a>
 
-                        <a href="{% url 'mail_list_class' %}?email_type=trash"
+                        <a href="{% url 'mail_list_class' %}?email_type=delete"
                            class="list-group-item d-flex align-items-center
-                             {% if 'trash' in request.get_full_path %}
+                             {% if '?email_type=delete' in request.get_full_path %}
                             bg-dark
                             {% endif %} ">
                             <i class="ti-trash list-group-icon mr-2 text-danger"></i>Trash
                             <span class="small ml-auto">{{ trash_count }}</span>
                         </a>
+
+                        <a href="{% url 'mail_draft_class' %}?email_type=trash_sender"
+                           class="list-group-item d-flex align-items-center
+                             {% if '?email_type=trash_sender' in request.get_full_path %}
+                            bg-dark
+                            {% endif %} ">
+                            <i class="ti-trash list-group-icon mr-2 text-danger"></i>Send Trash
+                            <span class="small ml-auto"></span>
+                        </a>
+
+
+
+
+
+
+
+
+
+
                     </div>
                     <div class="card-body">
                         <h6 class="mb-0">Labels</h6>
@@ -143,7 +172,7 @@
                             </a>
 
                             <div class="dropdown-menu">
-                                 {% if 'inbox' in request.get_full_path %}
+                                 {% if '?email_type=inbox' in request.get_full_path %}
                                 <a class="dropdown-item text-primary email_status_select"
                                    data-email_status="read" href="#">Mark as read</a>
 
@@ -157,32 +186,41 @@
                                 <a class="dropdown-item text-danger email_status_select"
                                    data-email_status="delete" href="#">Delete</a>
 
-                                {% elif 'send' in request.get_full_path %}
+                                {% elif '?email_type=send' in request.get_full_path %}
                                 <a class="dropdown-item text-danger email_status_select"
                                    data-email_status="delete" href="#">Delete</a>
 
-                                {% elif 'draft' in request.get_full_path %}
-                                <a class="dropdown-item text-success email_status_select"
-                                   data-email_status="send" href="#">Send Email</a>
+                                {% elif '?email_type=draft' in request.get_full_path %}
                                 <a class="dropdown-item text-danger email_status_select"
                                    data-email_status="delete" href="#">Delete</a>
 
-                                {% elif 'starred' in request.get_full_path %}
+                                {% elif '?email_type=starred_inbox' in request.get_full_path %}
                                 <a class="dropdown-item text-light email_status_select"
                                    data-email_status="star" href="#">UnMark as Star</a>
+
+                                {% elif '?email_type=starred_sender' in request.get_full_path %}
+                                <a class="dropdown-item text-light email_status_select"
+                                   data-email_status="star" href="#">UnMark as Star</a>
+
+
                                 {% elif 'spam' in request.get_full_path %}
                                 <a class="dropdown-item text-success email_status_select"
                                    data-email_status="spam" href="#">UnMark as Spam</a>
                                 <a class="dropdown-item text-danger email_status_select"
                                    data-email_status="delete" href="#">Delete</a>
-                                {% elif 'trash' in request.get_full_path %}
+                                {% elif 'delete' in request.get_full_path %}
                                 <a class="dropdown-item text-success email_status_select"
                                    data-email_status="delete" href="#">Recover Email</a>
                                 <a class="dropdown-item text-danger email_status_select"
                                    data-email_status="remove" href="#">Empty Trash</a>
+                                 {% endif %}
 
-
-                                {% endif %}
+                                {% if 'trash_sender' in request.get_full_path %}
+                                <a class="dropdown-item text-success email_status_select"
+                                   data-email_status="trash_sender" href="#">Recover Email</a>
+                                <a class="dropdown-item text-danger email_status_select"
+                                   data-email_status="remove" href="#">Empty Trash</a>
+                                 {% endif %}
 
 
                             </div>
@@ -356,10 +394,16 @@
                 <a href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}"class="add-star mr-3"title="Add stars">
                 <i class="fa font-size-16 {%if email.sender_starred%} text-warning fa-star{% else %}fa-star-o {%endif%}"></i></a>
                 {%endif%}
-                {% if '?email_type=starred'  in request.get_full_path %}
+                 {% if '?email_type=starred_sender'  in request.get_full_path %}
+                <a href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}"class="add-star mr-3"title="Add stars">
+                <i class="fa font-size-16 {%if email.sender_starred%} text-warning fa-star{% else %}fa-star-o {%endif%}"></i></a>
+                {%endif%}
+                {% if 'email_type=starred_inbox'  in request.get_full_path %}
                 <a href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}"class="add-star mr-3"title="Add stars">
                 <i class="fa font-size-16{%if email.mail_starred%} text-warning fa-star {% else %} fa-star-o {%endif%} "></i></a>
                 {%endif%}
+
+
 
 
 
@@ -437,19 +481,32 @@
                                                 <a class="dropdown-item text-danger"href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}">Delete</a>
                                                 {%endif%}
 
-                                                {%if '?email_type=starred' in request.get_full_path%}
+                                                {%if '?email_type=starred_inbox' in request.get_full_path%}
                                                  <a class="dropdown-item text-info" href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">Remove Star</a>
                                                  <a class="dropdown-item text-warning" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Mark as Spam</a>
                                                  <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
                                                 {%endif%}
+
+                                               {%if '?email_type=starred_sender' in request.get_full_path%}
+                                                 <a class="dropdown-item text-info" href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}">Remove Star</a>
+                                                  <a class="dropdown-item text-danger"href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}">Delete</a>
+                                                {%endif%}
+
+
+
 
                                                 {%if '?email_type=spam' in request.get_full_path%}
                                               <a class="dropdown-item text-success" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Unmark as Spam</a>
                                               <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
                                                 {%endif%}
 
-                                                {% if '?email_type=trash' in request.get_full_path%}
+                                                {% if '?email_type=delete' in request.get_full_path%}
                                                 <a class="dropdown-item text-success"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Recover Email</a>
+                                                <a class="dropdown-item text-danger"href="">Empty Trash</a>
+                                                  {%endif%}
+
+                                                {% if '?email_type=trash_sender' in request.get_full_path%}
+                                                <a class="dropdown-item text-success"href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}">Recover Email</a>
                                                 <a class="dropdown-item text-danger"href="">Empty Trash</a>
                                                   {%endif%}
 
@@ -473,19 +530,19 @@
                                             <div class="text-nowrap pl-3">
                                                 <ul class="list-inline">
                                                     <li class="list-inline-item mb-0">
-                                                            {%if email.mail.label == 'GR'%}
+                                                            {%if email.mail.label == 'GR' or email.label == 'GR'%}
                                                              <i class="fa fa-circle text-secondary"></i>
                                                             {%endif%}
-                                                            {%if email.mail.label == 'SP'%}
+                                                            {%if email.mail.label == 'SP' or email.label == 'SP' %}
                                                          <i class="fa fa-circle text-warning"></i>
                                                             {%endif%}
-                                                            {%if email.mail.label == 'AS'%}
+                                                            {%if email.mail.label == 'AS' or email.label == 'AS'%}
                                                          <i class="fa fa-circle text-success"></i>
                                                              {%endif%}
-                                                            {%if email.mail.label == 'EX'%}
+                                                            {%if email.mail.label == 'EX' or email.label == 'EX'%}
                                                          <i class="fa fa-circle text-info"></i>
                                                             {%endif%}
-                                                            {%if email.mail.label == 'PR'%}
+                                                            {%if email.mail.label == 'PR' or email.label == 'PR'%}
                                                        <i class="fa fa-circle text-danger"></i>
                                                             {%endif%}
 
@@ -914,16 +971,39 @@
 
 
             let get_url = "";
+            if (status === "star"){
+                {%if '?email_type=starred_inbox' in  request.get_full_path%}
+                get_url = "{% url 'mail_starred' pk=1234 %}".replace('1234', email_id);
+                {%endif%}
+
+                {%if '?email_type=starred_sender' in  request.get_full_path%}
+                get_url = "{% url 'sender_starred' pk=1234 %}".replace('1234', email_id);
+                {%endif%}
+            }
+
+
+
             if (status === "spam"){
                 get_url = "{% url 'mail_spam' pk=1234 %}".replace('1234', email_id);
             }
             if (status === "delete"){
                     {% if '?email_type=send' in request.get_full_path  %}
                         get_url = "{% url 'sender_delete' pk=1234 %}".replace('1234', email_id);
+
+                    {% elif '?email_type=draft' in request.get_full_path  %}
+                        get_url = "{% url 'sender_delete' pk=1234 %}".replace('1234', email_id);
+
                     {%else%}
                         get_url = "{% url 'mail_deleted' pk=1234 %}".replace('1234', email_id);
                     {%endif%}
             }
+
+            if (status === "trash_sender"){
+
+                        get_url = "{% url 'sender_delete' pk=1234 %}".replace('1234', email_id);
+
+            }
+
             if (status === "unread"){
                 get_url = "{% url 'mail_unread' pk=1234 %}".replace('1234', email_id);
             }
