@@ -23,8 +23,8 @@ class Mail(models.Model):
     sender = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="mail_sender")
     reply_to = models.ForeignKey("self", blank=True, null=True, on_delete=models.CASCADE)
 
-    # def __str__(self):
-    #     return self.subject + '--' + self.sender.username
+    def __str__(self):
+        return self.subject + '--' + self.sender.username
 
     def get_file_upload_name(self):
         if self.attachment:
@@ -44,8 +44,8 @@ class MailReceiver(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="mail_receiver")
     mail = models.ForeignKey(Mail, on_delete=models.CASCADE)
 
-    # def __str__(self):
-    #     return self.mail.subject + '--' + self.mail.sender.username + '--' + self.receiver.username
+    def __str__(self):
+        return self.mail.subject + '--' + self.mail.sender.username + '--' + self.receiver.username
 
     def get_file_upload_name(self):
         if self.mail.attachment:

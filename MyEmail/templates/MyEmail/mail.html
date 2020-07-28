@@ -232,11 +232,9 @@
                                 Order by
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                    <form {% if email_type == "draft" %}
-                                      action="{% url 'mail_draft_class' %}"
-                                                {%else%}
-                                        action="{% url 'mail_list_class' %}"
-                                                {%endif%} >
+
+                                {% if "mail_list_class" in request.get_full_path  %}
+                                    <form action="{% url 'mail_list_class' %}">
                                     <input type="hidden" name="filter" value="date">
                                     <input type="hidden" name="email_type" value="{{email_type}}">
                                     <button class="dropdown-item
@@ -246,11 +244,7 @@
                                         " type="submit">Date</button>
                                     </form>
 <!--                                <a class="dropdown-item" href="{{request.get_full_path}}&filter=date">Date</a>-->
-                                <form {% if email_type == "draft" %}
-                                      action="{% url 'mail_draft_class' %}"
-                                                {%else%}
-                                        action="{% url 'mail_list_class' %}"
-                                                {%endif%} >
+                                <form  action="{% url 'mail_list_class' %}">
                                     <input type="hidden" name="filter" value="from">
                                     <input type="hidden" name="email_type" value="{{email_type}}">
                                     <button class="dropdown-item
@@ -258,12 +252,10 @@
                                     active
                                     {%endif%}" type="submit">From</button>
                                 </form>
+
+
 <!--                                <a class="dropdown-item" href="#">From</a>-->
-                                <form {% if email_type == "draft" %}
-                                      action="{% url 'mail_draft_class' %}"
-                                                {%else%}
-                                        action="{% url 'mail_list_class' %}"
-                                                {%endif%} >
+                                <form  action="{% url 'mail_list_class' %}">
                                     <input type="hidden" name="filter" value="subject">
                                     <input type="hidden" name="email_type" value="{{email_type}}">
                                     <button class="dropdown-item
@@ -271,13 +263,11 @@
                                     active
                                     {%endif%}" type="submit">Subject</button>
                                 </form>
+
+
 <!--                                <a class="dropdown-item" href="#">Subject</a>-->
                                 <div class="dropdown-divider"></div>
-                                <form {% if email_type == "draft" %}
-                                      action="{% url 'mail_draft_class' %}"
-                                                {%else%}
-                                        action="{% url 'mail_list_class' %}"
-                                                {%endif%} >
+                                <form action="{% url 'mail_list_class' %}">
                                     <input type="hidden" name="filter" value="UnRead">
                                     <input type="hidden" name="email_type" value="{{email_type}}">
                                     <button class="dropdown-item
@@ -285,6 +275,35 @@
                                     active
                                     {%endif%}" type="submit">Unseen</button>
                                 </form>
+
+                                {%endif%}
+
+                             {% if "mail_draft_class" in request.get_full_path %}
+
+                                <form action="{% url 'mail_draft_class' %}">
+                                    <input type="hidden" name="filter" value="date">
+                                    <input type="hidden" name="email_type" value="{{email_type}}">
+                                    <button class="dropdown-item
+                                    {%if 'date' in request.get_full_path%}
+                                    active
+                                    {%endif%}
+                                        " type="submit">Date</button>
+                                    </form>
+
+                                <div class="dropdown-divider"></div>
+                                 <form  action="{% url 'mail_draft_class' %}">
+                                    <input type="hidden" name="filter" value="subject">
+                                    <input type="hidden" name="email_type" value="{{email_type}}">
+                                    <button class="dropdown-item
+                                         {%if 'subject' in request.get_full_path%}
+                                    active
+                                    {%endif%}" type="submit">Subject</button>
+                                </form>
+
+
+
+
+                                {% endif %}
 
 
 
@@ -1138,20 +1157,8 @@
 
     });
 
-    // Email Detail Attachment
-    $("#card_content_attached_files").change(function(){
-        let file_path = ($("#card_content_attached_files").html);
-        let file_name = file_path.substr(file_path.lastIndexOf('\\') + 1);
-        $("#card_content_attached_files").html(file_name);
 
 
-    });
-
-
-
-    // let file_path = $("#customFileLangHTML").val();
-    // let file_name = file_path.substr(file_path.lastIndexOf('\\') + 1);
-    // $("label[for='customFileLangHTML']").html(file_name);
 
 </script>
 
