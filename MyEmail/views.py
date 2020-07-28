@@ -202,7 +202,7 @@ class StarTrashView(ListView):
         context['practical_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
                                                                        mail_deleted=False, mail_spam=False,
                                                                        mail__label='PR').count()
-
+        context['star_mail'] = MailReceiver.mail_starred
         return context
 
 
