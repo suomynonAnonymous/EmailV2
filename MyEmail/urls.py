@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import MailListView, mail_starred, mail_deleted, mail_send, mail_viewed, mail_unread, mail_spam, \
     MailDraftView, MailDetailView, DraftUpdateView, MailMultipleCreate, DraftCreateView, ReplyCreateView, \
-    SendDetailView, sender_starred, sender_delete
+    SendDetailView, sender_starred, sender_delete, StarTrashView
 
 urlpatterns = [
     path('mail_list_class', MailListView.as_view(), name='mail_list_class'),
@@ -10,6 +10,8 @@ urlpatterns = [
     path('draft_create_class', DraftCreateView.as_view(), name='draft_create_class'),
     path('reply_create_class', ReplyCreateView.as_view(), name='reply_create_class'),
     path('mail_draft_class', MailDraftView.as_view(), name='mail_draft_class'),
+    path('star_trash_class', StarTrashView.as_view(), name='star_trash_class'),
+
     path('mail_spam/<int:pk>', mail_spam, name='mail_spam'),
     path('mail_starred/<int:pk>', mail_starred, name='mail_starred'),
     path('sender_starred/<int:pk>', sender_starred, name='sender_starred'),

@@ -44,7 +44,8 @@ class MailDraftView(ListView):
         context['email_type'] = self.request.GET.get('email_type', "send")
         context['inbox_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_deleted=False,
                                                              mail_spam=False, mail_viewed=False).count()
-        context['starred_count'] = MailReceiver.objects.filter(mail_starred=True, mail_deleted=False).count()
+        context['starred_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_starred=True,
+                                                               mail_deleted=False).count()
         context['trash_count'] = MailReceiver.objects.filter(mail_deleted=True).count()
         context['search_q'] = self.request.GET.get('search', '')
         context['filter'] = self.request.GET.get('filter', '')
@@ -78,9 +79,9 @@ class MailListView(ListView):
         email_type = self.request.GET.get('email_type', "inbox")
         if email_type == "inbox":
             queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=False))
-        if email_type == "starred":
-            queryset = queryset.filter(
-                Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_starred=True) & Q(mail_spam=False))
+        # if email_type == "starred":
+        #   queryset = queryset.filter(
+        #     Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_starred=True) & Q(mail_spam=False))
         if email_type == "spam":
             queryset = queryset.filter(Q(receiver=self.request.user) & Q(mail_deleted=False) & Q(mail_spam=True))
         if email_type == "trash":
@@ -140,6 +141,68 @@ class MailListView(ListView):
         context['practical_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
                                                                        mail_deleted=False, mail_spam=False,
                                                                        mail__label='PR').count()
+        return context
+
+
+class StarTrashView(ListView):
+    model = Mail
+    paginate_by = 10
+    template_name = "MyEmail/star_trash.html"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        email_type = self.request.GET.get('email_type', "starred")
+        queryset = Mail.objects.filter(sender=self.request.user, sender_starred=True, sender_delete=False) | \
+                   Mail.objects.filter(mailreceiver__receiver=self.request.user, mailreceiver__mail_starred=True,
+                                       mailreceiver__mail_deleted=False)
+        search = self.request.GET.get('search', "")
+        queryset = queryset.filter(
+            Q(sender__username__icontains=search) | Q(body__icontains=search) | Q(subject__icontains=search))
+        filter_type = self.request.GET.get('filter', "date")
+        if filter_type == "date":
+            queryset = queryset.order_by('mailreceiver__received_date')
+        if filter_type == "from":
+            queryset = queryset.order_by('sender__username')
+        if filter_type == "subject":
+            queryset = queryset.order_by('subject')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        for obj in context['object_list']:
+            if obj.sender == self.request.user:
+                obj.rec_obj = None
+            else:
+                obj.rec_obj = MailReceiver.objects.get(mail=obj, receiver=self.request.user)
+        context['email_type'] = self.request.GET.get('email_type', "starred")
+        context['label_list'] = Mail.LABEL_CHOICES
+        context['user_list'] = User.objects.all().exclude(id=self.request.user.id)
+        context['inbox_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_deleted=False,
+                                                             mail_spam=False, mail_viewed=False).count()
+        context['starred_count'] = MailReceiver.objects.filter(Q(mail_starred=True, mail_deleted=False,
+                                                                 receiver=self.request.user) | Q(
+            mail__sender_starred=True, mail__sender_delete=False,
+            mail__sender=self.request.user)).count()
+        context['trash_count'] = MailReceiver.objects.filter(mail_deleted=True, receiver=self.request.user).count()
+        context['search_q'] = self.request.GET.get('search', '')
+        context['filter'] = self.request.GET.get('filter', '')
+        context['general_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                     mail_deleted=False, mail_spam=False,
+                                                                     mail__label='GR').count()
+        context['support_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                     mail_deleted=False, mail_spam=False,
+                                                                     mail__label='SP').count()
+        context['assignment_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                        mail_deleted=False, mail_spam=False,
+                                                                        mail__label='AS').count()
+        context['exam_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                  mail_deleted=False, mail_spam=False,
+                                                                  mail__label='EX').count()
+        context['practical_label_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_viewed=False,
+                                                                       mail_deleted=False, mail_spam=False,
+                                                                       mail__label='PR').count()
+
         return context
 
 

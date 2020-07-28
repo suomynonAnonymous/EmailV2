@@ -204,8 +204,8 @@
                                 Order by
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                {%if "mail_list_class" in request.get_full_path %}
-                                    <form action="{% url 'mail_list_class' %}">
+
+                                    <form action="{% url 'star_trash_class' %}?email_type={{email_type}}">
                                     <input type="hidden" name="filter" value="date">
                                     <input type="hidden" name="email_type" value="{{email_type}}">
                                     <button class="dropdown-item
@@ -215,7 +215,7 @@
                                         " type="submit">Date</button>
                                     </form>
 <!--                                <a class="dropdown-item" href="{{request.get_full_path}}&filter=date">Date</a>-->
-                                <form action="{% url 'mail_list_class' %}">
+                                <form action="{% url 'star_trash_class' %}?email_type={{email_type}}">
                                     <input type="hidden" name="filter" value="from">
                                     <input type="hidden" name="email_type" value="{{email_type}}">
                                     <button class="dropdown-item
@@ -224,7 +224,7 @@
                                     {%endif%}" type="submit">From</button>
                                 </form>
 <!--                                <a class="dropdown-item" href="#">From</a>-->
-                                <form action="{% url 'mail_list_class' %}">
+                                <form action="{% url 'star_trash_class' %}?email_type={{email_type}}">
                                     <input type="hidden" name="filter" value="subject">
                                     <input type="hidden" name="email_type" value="{{email_type}}">
                                     <button class="dropdown-item
@@ -232,45 +232,6 @@
                                     active
                                     {%endif%}" type="submit">Subject</button>
                                 </form>
-<!--                                <a class="dropdown-item" href="#">Subject</a>-->
-                                <div class="dropdown-divider"></div>
-                                <form action="{% url 'mail_list_class' %}">
-                                    <input type="hidden" name="filter" value="UnRead">
-                                    <input type="hidden" name="email_type" value="{{email_type}}">
-                                    <button class="dropdown-item
-                                         {%if 'UnRead' in request.get_full_path%}
-                                    active
-                                    {%endif%}" type="submit">Unseen</button>
-                                </form>
-
-                                {%endif%}
-                                {%if "mail_draft_class" in request.get_full_path%}
-                                     <form action="{% url 'mail_draft_class' %}">
-                                    <input type="hidden" name="filter" value="date">
-                                    <input type="hidden" name="email_type" value="{{email_type}}">
-                                    <button class="dropdown-item
-                                    {%if 'date' in request.get_full_path%}
-                                    active
-                                    {%endif%}
-                                        " type="submit">Date</button>
-                                    </form>
-
-                                 <div class="dropdown-divider"></div>
-
-                                <form action="{% url 'mail_draft_class' %}">
-                                    <input type="hidden" name="filter" value="subject">
-                                    <input type="hidden" name="email_type" value="{{email_type}}">
-                                    <button class="dropdown-item
-                                         {%if 'subject' in request.get_full_path%}
-                                    active
-                                    {%endif%}" type="submit">Subject</button>
-                                </form>
-
-                                {%endif%}
-
-
-
-<!--                                <a class="dropdown-item" href="#">Size</a>-->
                             </div>
                         </li>
                     </ul>
@@ -308,12 +269,19 @@
                                     <li class="page-item">
                                          {% if page_obj.has_previous %}
                                         <a class="page-link"
+                                           {% if "star_trash_class" in request.get_full_path %}
+                                           href="{% url 'star_trash_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
+                                            {%endif%}
+
                                            {%if "mail_list_class" in request.get_full_path%}
                                            href="{% url 'mail_list_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
-                                           {%else%}
-                                           href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
-
                                             {%endif%}
+
+                                           {% if "mail_draft_class" in request.get_full_path%}
+                                           href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
+                                            {%endif%}
+
+
                                            aria-label="Previous">
                                             <i class="ti-arrow-left"></i>
                                         </a>
@@ -322,15 +290,22 @@
 
                                    <li class="page-item">
                                     {% if page_obj.has_next %}
-                                    <a class="page-link"
-                                       {%if "mail_list_class" in request.get_full_path%}
-                                       href="{% url 'mail_list_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
-                                       {%else%}
-                                      href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
-                                        {%endif%}
-                                       aria-label="Next">
-                                        <i class="ti-arrow-right"></i>
-                                    </a>
+                                        <a class="page-link"
+                                           {%if "mail_list_class" in request.get_full_path%}
+                                             href="{% url 'mail_list_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
+                                          {%endif%}
+
+                                           {% if "star_trash_class" in request.get_full_path %}
+                                             href="{% url 'star_trash_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
+                                           {%endif%}
+
+                                           {%if "mail_draft_class" in request.get_full_path %}
+                                            href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
+                                            {%endif%}
+
+                                           aria-label="Next">
+                                            <i class="ti-arrow-right"></i>
+                                        </a>
                                     {%endif%}
                                    </li>
 
@@ -344,195 +319,257 @@
 
                 <div class="app-lists">
                     <ul class="list-group list-group-flush">
-                       {% for email in object_list%}
-                        <li class="list-group-item card_display_email
-                         {% if 'inbox' in request.get_full_path %}
-                                {%if email.mail_viewed%}
-                                    text-light
-                                        {%else%}
-                                        bg-dark
-                                        {%endif%}
-                                    {%else%}
-                                    text-light
-                                    {%endif%}"
-
-                                    list_email_id="{{email.pk}}"
-                                    id="email_list_li{{ email.pk }}"
-                                    data-email_subject="{{ email.mail.subject }}"
-                                    data-email_body="{{email.body}} "
-                                    data-email_sender="{{email.sender}} &lt{{email.sender.email}}&gt"
-                                    data-email_label="{{email.get_label_display}}"
-                                    {# data-email_receiver="{{email.receiver}} &lt{{email.receiver.email}}&gt" #}
-                                    data-email_receiver="{{email.get_receivers_display}}"
-                                    data-email_viewed_date="{{email.received_date}}"
-                                    data-email_attached_files="{% if email.file_upload %}{{email.file_upload.url}}{% endif %}"
-                                    data-email_file_name="{% if email.file_upload %}{{email.file_upload.name}}{% endif %}">
-                                    <div>
-                                        <div class="custom-control custom-checkbox mr-2">
-                                            <input type="checkbox" class="custom-control-input email_checkbox"
-                                                   data-email_id="{{email.pk}}"
-                                                   id="customCheck{{forloop.counter}}">
-                                            <label class="custom-control-label"
-                                                   for="customCheck{{forloop.counter}}"></label>
-                                        </div>
-                                    </div>
-                                    <div>
-                {% if '?email_type=inbox'  in request.get_full_path %}
-                <a href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}"class="add-star mr-3"title="Add stars">
-                <i class="fa font-size-16{%if email.mail_starred%} text-warning fa-star {% else %} fa-star-o {%endif%} "></i></a>
-                {%endif%}
-                {% if '?email_type=send'  in request.get_full_path %}
-                <a href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}"class="add-star mr-3"title="Add stars">
-                <i class="fa font-size-16 {%if email.sender_starred%} text-warning fa-star{% else %}fa-star-o {%endif%}"></i></a>
-                {%endif%}
-                {% if '?email_type=starred'  in request.get_full_path %}
-                <a href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}"class="add-star mr-3"title="Add stars">
-                <i class="fa font-size-16{%if email.mail_starred%} text-warning fa-star {% else %} fa-star-o {%endif%} "></i></a>
-                {%endif%}
+                        {% for email in object_list%}
 
 
 
 
+                        {%if email.rec_obj%}
+                        <li class="list-group-item card_display_email"
+                            data-email_detail_url="{% url 'mail_detail' email.rec_obj.pk %}"
+                            list_email_id="{{email.rec_obj.pk}}"
+                            id="email_list_li{{ email.rec_obj.pk }}"
+                            data-email_subject="{{ email.subject }}"
+                            data-email_body="{{email.body}} "
+                            data-email_sender="{{email.sender}} &lt{{email.sender.email}}&gt"
+                            data-email_label="{{email.get_label_display}}"
+
+                            data-email_viewed_date="{{email.received_date}}"
+                            data-email_attached_files="{% if email.file_upload %}{{email.file_upload.url}}{% endif %}"
+                            data-email_file_name="{% if email.file_upload %}{{email.file_upload.name}}{% endif %}">
+                            <div>
+                                <div class="custom-control custom-checkbox mr-2">
+                                    <input type="checkbox" class="custom-control-input email_checkbox"
+                                           data-email_id="{{email.pk}}"
+                                           id="customCheck{{forloop.counter}}">
+                                    <label class="custom-control-label"
+                                           for="customCheck{{forloop.counter}}"></label>
+                                </div>
+                            </div>
+                            <div>
 
 
+                                {% if '?email_type=starred' in request.get_full_path %}
+                                <a href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}"
+                                   class="add-star mr-3" title="Add stars">
+                                    <i class="fa font-size-16{%if email.sender_starred%} text-warning fa-star {% else %} fa-star-o {%endif%} "></i></a>
+                                {%endif%}
 
 
+                            </div>
+                            <div>
+                                <figure class="avatar avatar-sm mr-3">
+                                    <img src="{%static "/admin/assets/media/image/user/man_avatar5.jpg"%}"
+                                    class="rounded-circle" alt="image">
+                                </figure>
+                            </div>
+                            <div class="flex-grow-1 min-width-0   ">
+                                <div class="mb-1 d-flex justify-content-between align-items-center">
+                                    <div class="text-truncate app-list-title">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+                                        {{email.sender}}
+                                        &lt{{email.sender.email}}&gt
 
                                     </div>
-                                    <div>
-                                        <figure class="avatar avatar-sm mr-3">
-                                            <img src="{%static "/admin/assets/media/image/user/man_avatar5.jpg"%}"
-                                            class="rounded-circle" alt="image">
-                                        </figure>
-                                    </div>
-                                    <div class="flex-grow-1 min-width-0   ">
-                                        <div class="mb-1 d-flex justify-content-between align-items-center">
-                                            <div class="text-truncate app-list-title">
-                                                {% if 'mail_draft_class' in request.get_full_path %}
-                                                        {{email.sender}}
-                                                    &lt{{email.sender.email}}&gt
-                                                            {%else%}
-                                                     {{email.mail.sender}}
-                                                &lt{{email.mail.sender.email}}&gt
-                                                         {%endif%}
-                                            </div>
-                                            <div class="pl-3 d-flex">
+                                    <div class="pl-3 d-flex">
                                                 <span class="text-nowrap text-muted">
-                                                    {% if 'mail_draft_class' in request.get_full_path %}
+
                                                     {{email.created_date|date:"d F"}}
-                                                        {%else%}
-                                                    {{email.received_date|date:"d F"}}
-                                                        {%endif%}
+
                                                 </span>
 
 
-                                                <div class="dropdown ml-3">
-                                                    <a href="#" class="btn btn-outline-light btn-floating btn-sm"
-                                                       data-toggle="dropdown">
-                                                        <i class="fa fa-ellipsis-h"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-right ">
-
-                                                        {% if '?email_type=inbox' in request.get_full_path%}
-                                                 <a class="dropdown-item reply_view text-info" id="reply_view{{ email.pk }}"data-email_id="{{ email.pk }}"href="#">Reply</a>
-                                                 <a class="dropdown-item text-warning" href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">
-                                                 {%if email.mail_starred%}Remove Star{%else%} Add star {%endif%}</a>
-                                                 <a class="dropdown-item text-danger" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Mark as Spam </a>
-                                                 <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}"> Delete  </a>
-                                                        {%endif%}
+                                        <div class="dropdown ml-3">
+                                            <a href="#" class="btn btn-outline-light btn-floating btn-sm"
+                                               data-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-h"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right ">
 
 
-                                                        {% if '?email_type=send' in request.get_full_path%}
-                                              <a class="dropdown-item text-danger"href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}"> Delete </a>
-                                              <a class="dropdown-item text-warning" href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}">
-                                               {%if email.sender_starred%}Remove Star {%else%} Add star {%endif%}</a>
-                                                       {%endif%}
 
-                                                {%if '?email_type=draft' in request.get_full_path%}
-                                                <a class="dropdown-item text-danger"href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}">Delete</a>
-                                                {%endif%}
+
+
 
                                                 {%if '?email_type=starred' in request.get_full_path%}
-                                                 <a class="dropdown-item text-info" href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">Remove Star</a>
-                                                 <a class="dropdown-item text-warning" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Mark as Spam</a>
-                                                 <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
+                                                <a class="dropdown-item text-info"
+                                                   href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">Remove
+                                                    Star</a>
+                                                <a class="dropdown-item text-warning"
+                                                   href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Mark as
+                                                    Spam</a>
+                                                <a class="dropdown-item text-danger"
+                                                   href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
                                                 {%endif%}
 
-                                                {%if '?email_type=spam' in request.get_full_path%}
-                                              <a class="dropdown-item text-success" href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Unmark as Spam</a>
-                                              <a class="dropdown-item text-danger"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
-                                                {%endif%}
 
-                                                {% if '?email_type=trash' in request.get_full_path%}
-                                                <a class="dropdown-item text-success"href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Recover Email</a>
-                                                <a class="dropdown-item text-danger"href="">Empty Trash</a>
-                                                  {%endif%}
-
-
-                                                    </div>
-                                                </div>
 
 
 
 
                                             </div>
                                         </div>
-                                        <div class="text-muted d-flex justify-content-between">
-                                            <div class="text-truncate small">
-                                            {% if 'mail_draft_class' in request.get_full_path  %}
-                                                    {{email.subject}}
-                                            {%else%}
-                                                {{email.mail.subject}}
-                                            {%endif%}
-                                            </div>
-                                            <div class="text-nowrap pl-3">
-                                                <ul class="list-inline">
-                                                    <li class="list-inline-item mb-0">
-                                                            {%if email.mail.label == 'GR'%}
-                                                             <i class="fa fa-circle text-secondary"></i>
-                                                            {%endif%}
-                                                            {%if email.mail.label == 'SP'%}
-                                                         <i class="fa fa-circle text-warning"></i>
-                                                            {%endif%}
-                                                            {%if email.mail.label == 'AS'%}
-                                                         <i class="fa fa-circle text-success"></i>
-                                                             {%endif%}
-                                                            {%if email.mail.label == 'EX'%}
-                                                         <i class="fa fa-circle text-info"></i>
-                                                            {%endif%}
-                                                            {%if email.mail.label == 'PR'%}
-                                                       <i class="fa fa-circle text-danger"></i>
-                                                            {%endif%}
 
 
-
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
                                     </div>
-                                </li>
-                                {%endfor%}
+                                </div>
+                                <div class="text-muted d-flex justify-content-between">
+                                    <div class="text-truncate small">
+
+                                        {{email.subject}}
+
+                                    </div>
+                                    <div class="text-nowrap pl-3">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item mb-0">
+                                                {%if email.label == 'GR'%}
+                                                <i class="fa fa-circle text-secondary"></i>
+                                                {%endif%}
+                                                {%if email.label == 'SP'%}
+                                                <i class="fa fa-circle text-warning"></i>
+                                                {%endif%}
+                                                {%if email.label == 'AS'%}
+                                                <i class="fa fa-circle text-success"></i>
+                                                {%endif%}
+                                                {%if email.label == 'EX'%}
+                                                <i class="fa fa-circle text-info"></i>
+                                                {%endif%}
+                                                {%if email.label == 'PR'%}
+                                                <i class="fa fa-circle text-danger"></i>
+                                                {%endif%}
+
+
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {%else%}
+                        <li class="list-group-item card_display_email"
+                            list_email_id="{{email.pk}}"
+                            data-email_detail_url="{% url 'send_detail' email.pk%}"
+                            id="email_list_li2{{ email.pk }}"
+                            data-email_subject="{{ email.subject }}"
+                            data-email_body="{{email.body}} "
+                            data-email_sender="{{email.sender}} &lt{{email.sender.email}}&gt"
+                            data-email_label="{{email.get_label_display}}"
+
+                            data-email_viewed_date="{{email.created_date}}"
+                            data-email_attached_files="{% if email.file_upload %}{{email.file_upload.url}}{% endif %}"
+                            data-email_file_name="{% if email.file_upload %}{{email.file_upload.name}}{% endif %}">
+                            <div>
+                                <div class="custom-control custom-checkbox mr-2">
+                                    <input type="checkbox" class="custom-control-input email_checkbox"
+                                           data-email_id="{{email.pk}}"
+                                           id="customCheck2{{forloop.counter}}">
+                                    <label class="custom-control-label"
+                                           for="customCheck{{forloop.counter}}"></label>
+                                </div>
+                            </div>
+                            <div>
+
+
+                                {% if '?email_type=starred' in request.get_full_path %}
+                                <a href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}"
+                                   class="add-star mr-3" title="Add stars">
+                                    <i class="fa font-size-16{%if email.sender_starred%} text-warning fa-star {% else %} fa-star-o {%endif%} "></i></a>
+                                {%endif%}
+
+
+                            </div>
+                            <div>
+                                <figure class="avatar avatar-sm mr-3">
+                                    <img src="{%static "/admin/assets/media/image/user/man_avatar5.jpg"%}"
+                                    class="rounded-circle" alt="image">
+                                </figure>
+                            </div>
+                            <div class="flex-grow-1 min-width-0   ">
+                                <div class="mb-1 d-flex justify-content-between align-items-center">
+                                    <div class="text-truncate app-list-title">
+
+                                        {{email.sender}}
+                                        &lt{{email.sender.email}}&gt
+
+                                    </div>
+                                    <div class="pl-3 d-flex">
+                                                <span class="text-nowrap text-muted">
+
+                                                    {{email.created_date|date:"d F"}}
+
+                                                </span>
+
+
+                                        <div class="dropdown ml-3">
+                                            <a href="#" class="btn btn-outline-light btn-floating btn-sm"
+                                               data-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-h"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right ">
+
+
+
+
+
+
+                                                {%if '?email_type=starred' in request.get_full_path%}
+                                                <a class="dropdown-item text-info"
+                                                   href="{%url 'sender_starred' email.pk%}?email_type={{email_type}}">Remove
+                                                    Star</a>
+
+                                                <a class="dropdown-item text-danger"
+                                                   href="{%url 'sender_delete' email.pk%}?email_type={{email_type}}">Delete</a>
+                                                {%endif%}
+
+
+
+
+
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="text-muted d-flex justify-content-between">
+                                    <div class="text-truncate small">
+
+                                        {{email.subject}}
+
+                                    </div>
+                                    <div class="text-nowrap pl-3">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item mb-0">
+                                                {%if email.label == 'GR'%}
+                                                <i class="fa fa-circle text-secondary"></i>
+                                                {%endif%}
+                                                {%if email.label == 'SP'%}
+                                                <i class="fa fa-circle text-warning"></i>
+                                                {%endif%}
+                                                {%if email.label == 'AS'%}
+                                                <i class="fa fa-circle text-success"></i>
+                                                {%endif%}
+                                                {%if email.label == 'EX'%}
+                                                <i class="fa fa-circle text-info"></i>
+                                                {%endif%}
+                                                {%if email.label == 'PR'%}
+                                                <i class="fa fa-circle text-danger"></i>
+                                                {%endif%}
+
+
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {%endif%}
+                        {%endfor%}
                         <li class="list-group-item d-none card_display_email" data-dummy_data="true"></li>
 
                     </ul>
                 </div>
-
-
 
 
                 <!-- end::app-lists -->
@@ -548,6 +585,11 @@
 
         </div>
     </div>
+
+
+
+
+
 
     <div class="modal fade" tabindex="-1" role="dialog" id="compose">
         <div class="modal-dialog" role="document">
@@ -897,16 +939,10 @@
         let email_id = $(this).attr('list_email_id');
         let this_el = $(this);
         //console.log(email_id)
-         {% if email_type == 'draft' %}
-            get_url = "{%url 'mail_draft_detail' pk=1234 %}".replace('1234', email_id);
-            window.location.href = get_url;
-          {% elif email_type == 'send' %}
-            get_url = "{%url 'send_detail' pk=1234 %}".replace('1234', email_id);
-            window.location.href = get_url;
-         {% else %}
-             get_url = "{%url 'mail_detail' pk=1234 %}".replace('1234', email_id);
-             window.location.href = get_url;
-         {% endif %}
+
+             window.location.href = $(this).attr('data-email_detail_url');
+
+
        }
        else{
           console.log("just display");
