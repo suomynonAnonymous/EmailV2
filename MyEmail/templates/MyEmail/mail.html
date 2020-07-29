@@ -276,11 +276,11 @@
                     </ul>
                 </div>
                 <div class="action-right">
-                    <form class="d-flex mr-3" method="GET" {% if email_type == "draft" %}
-                                      action="{% url 'mail_draft_class' %}"
-                                                {%else%}
-                                        action="{% url 'mail_list_class' %}"
-                                                {%endif%}>
+                    <form class="d-flex mr-3" method="GET" {% if email_type == "draft" or email_type == "send" %}
+                                            action="{% url 'mail_draft_class' %}"
+                                                            {%else%}
+                                                action="{% url 'mail_list_class' %}"
+                                                            {%endif%}>
                         <a href="#" class="app-sidebar-menu-button btn btn-outline-light">
                             <i data-feather="menu" class="width-15 height-15"></i>
                         </a>

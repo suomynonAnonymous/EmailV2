@@ -44,8 +44,12 @@ class MailDraftView(ListView):
         context['email_type'] = self.request.GET.get('email_type', "send")
         context['inbox_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_deleted=False,
                                                              mail_spam=False, mail_viewed=False).count()
-        context['starred_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_starred=True,
-                                                               mail_deleted=False).count()
+        context['starred_count'] = MailReceiver.objects.filter(Q(mail_starred=True, mail_deleted=False,
+                                                                 receiver=self.request.user) | Q(
+            mail__sender_starred=True, mail__sender_delete=False,
+            mail__sender=self.request.user)).count()
+        # context['starred_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_starred=True,
+        #                                                       mail_deleted=False).count()
         context['trash_count'] = MailReceiver.objects.filter(mail_deleted=True).count()
         context['search_q'] = self.request.GET.get('search', '')
         context['filter'] = self.request.GET.get('filter', '')
@@ -121,8 +125,12 @@ class MailListView(ListView):
         context['email_type'] = self.request.GET.get('email_type', "inbox")
         context['inbox_count'] = MailReceiver.objects.filter(receiver=self.request.user, mail_deleted=False,
                                                              mail_spam=False, mail_viewed=False).count()
-        context['starred_count'] = MailReceiver.objects.filter(mail_starred=True, mail_deleted=False,
-                                                               receiver=self.request.user).count()
+        context['starred_count'] = MailReceiver.objects.filter(Q(mail_starred=True, mail_deleted=False,
+                                                                 receiver=self.request.user) | Q(
+            mail__sender_starred=True, mail__sender_delete=False,
+            mail__sender=self.request.user)).count()
+        # context['starred_count'] = MailReceiver.objects.filter(mail_starred=True, mail_deleted=False,
+        #                                                        receiver=self.request.user).count()
         context['trash_count'] = MailReceiver.objects.filter(mail_deleted=True, receiver=self.request.user).count()
         context['search_q'] = self.request.GET.get('search', '')
         context['filter'] = self.request.GET.get('filter', '')

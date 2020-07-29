@@ -206,11 +206,10 @@
                     </ul>
                 </div>
                 <div class="action-right">
-                    <form class="d-flex mr-3" method="GET" {% if email_type == "draft" %}
-                                      action="{% url 'mail_draft_class' %}"
-                                                {%else%}
-                                        action="{% url 'mail_list_class' %}"
-                                                {%endif%}>
+                    <form class="d-flex mr-3" method="GET"
+                                                    {% if email_type == "starred" %}
+                                                    action="{% url 'star_trash_class' %}"
+                                                              {% endif %}>
                         <a href="#" class="app-sidebar-menu-button btn btn-outline-light">
                             <i data-feather="menu" class="width-15 height-15"></i>
                         </a>
@@ -242,14 +241,6 @@
                                            href="{% url 'star_trash_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
                                             {%endif%}
 
-                                           {%if "mail_list_class" in request.get_full_path%}
-                                           href="{% url 'mail_list_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
-                                            {%endif%}
-
-                                           {% if "mail_draft_class" in request.get_full_path%}
-                                           href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
-                                            {%endif%}
-
 
                                            aria-label="Previous">
                                             <i class="ti-arrow-left"></i>
@@ -260,17 +251,11 @@
                                    <li class="page-item">
                                     {% if page_obj.has_next %}
                                         <a class="page-link"
-                                           {%if "mail_list_class" in request.get_full_path%}
-                                             href="{% url 'mail_list_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
-                                          {%endif%}
+
 
                                            {% if "star_trash_class" in request.get_full_path %}
                                              href="{% url 'star_trash_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
                                            {%endif%}
-
-                                           {%if "mail_draft_class" in request.get_full_path %}
-                                            href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
-                                            {%endif%}
 
                                            aria-label="Next">
                                             <i class="ti-arrow-right"></i>
