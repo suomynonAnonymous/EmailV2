@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, F, IntegerField, ForeignKey
+from django.db import models
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -7,6 +8,7 @@ from django.views.generic import ListView, DetailView, UpdateView, CreateView
 
 from .forms import DraftUpdateForm, MailReceiverForm, MailForm, ReplyForm
 from .models import Mail, MailReceiver
+from django.db.models.expressions import RawSQL
 
 
 class MailDraftView(ListView):
@@ -152,29 +154,74 @@ class StarTrashView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         email_type = self.request.GET.get('email_type', "starred")
-        queryset = Mail.objects.filter(sender=self.request.user, sender_starred=True, sender_delete=False) | \
-                   Mail.objects.filter(mailreceiver__receiver=self.request.user, mailreceiver__mail_starred=True,
-                                       mailreceiver__mail_deleted=False)
+
+        # qs12 = Mail.objects.filter(mailreceiver__receiver=self.request.user, mailreceiver__mail_starred=True,
+        #                            mailreceiver__mail_deleted=False)
+        # queryset = Mail.objects.filter(sender=self.request.user, sender_starred=True, sender_delete=False) | \
+        #            Mail.objects.filter(pk__in=qs12)
+
+        # for q in queryset:
+        #     if q.sender == self.request.user:
+        #         q.f_username = q.sender.username
+        #         q.f_date = q.created_date
+        #     else:
+        #         r_obj = MailReceiver.objects.get(receiver=self.request.user, mail=q)
+        #
+        #         q.f_username = r_obj.receiver.username
+        #         q.f_date = r_obj.received_date
+
+
+        # print(queryset)
+        # for q in queryset:
+        #     print(q.pk, q.filter_date)
+
+
+        m_qs = Mail.objects.filter(sender=self.request.user, sender_starred=True, sender_delete=False)
+        mr_qs = MailReceiver.objects.filter(receiver=self.request.user, mail_starred=True, mail_deleted=False)
+
         search = self.request.GET.get('search', "")
-        queryset = queryset.filter(
-            Q(sender__username__icontains=search) | Q(body__icontains=search) | Q(subject__icontains=search))
+        m_qs = m_qs.filter(Q(sender__username__icontains=search) | Q(body__icontains=search) | Q(subject__icontains=search))
+        mr_qs = mr_qs.filter(
+            Q(mail__sender__username__icontains=search) | Q(mail__body__icontains=search) | Q(mail__subject__icontains=search)
+        )
+
+        # queryset = queryset.filter(
+        #     # Q(sender__username__icontains=search) | Q(body__icontains=search) | Q(subject__icontains=search))
+        #     Q(f_username__icontains=search) | Q(body__icontains=search) | Q(subject__icontains=search))
+
+        m_qs = m_qs.values(
+            'pk', 'created_date', 'subject', 'is_mail'
+        )
+        mr_qs = mr_qs.values(
+            'pk', 'received_date', 'mail__subject', 'is_mail'
+        )
+        m_qs = m_qs.union(mr_qs, all=True)
         filter_type = self.request.GET.get('filter', "date")
         if filter_type == "date":
-            queryset = queryset.order_by('mailreceiver__received_date')
-        if filter_type == "from":
-            queryset = queryset.order_by('sender__username')
-        if filter_type == "subject":
-            queryset = queryset.order_by('subject')
+            # queryset = queryset.order_by('created_date')
+            m_qs = m_qs.order_by('created_date')
 
-        return queryset
+        if filter_type == "subject":
+            m_qs = m_qs.order_by('subject')
+
+        print(m_qs.count())
+        return m_qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
+        colist = []
         for obj in context['object_list']:
+            if obj["is_mail"]:
+                colist.append(Mail.objects.get(pk=obj['pk']))
+            else:
+                colist.append(MailReceiver.objects.get(pk=obj['pk']).mail)
+        for obj in colist:
             if obj.sender == self.request.user:
                 obj.rec_obj = None
             else:
                 obj.rec_obj = MailReceiver.objects.get(mail=obj, receiver=self.request.user)
+        context['object_list'] = colist
+
         context['email_type'] = self.request.GET.get('email_type', "starred")
         context['label_list'] = Mail.LABEL_CHOICES
         context['user_list'] = User.objects.all().exclude(id=self.request.user.id)

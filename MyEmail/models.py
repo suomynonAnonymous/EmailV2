@@ -19,6 +19,7 @@ class Mail(models.Model):
     sender_starred = models.BooleanField(default=False)
     sender_delete = models.BooleanField(default=False)
     mail_draft = models.BooleanField(default=False)
+    is_mail = models.BooleanField(default=True)
     # related fields
     sender = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="mail_sender")
     reply_to = models.ForeignKey("self", blank=True, null=True, on_delete=models.CASCADE)
@@ -43,6 +44,7 @@ class MailReceiver(models.Model):
     mail_deleted = models.BooleanField(default=False)
     mail_viewed = models.BooleanField(default=False)
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="mail_receiver")
+    is_mail = models.BooleanField(default=False)
     mail = models.ForeignKey(Mail, on_delete=models.CASCADE)
 
     def __str__(self):
