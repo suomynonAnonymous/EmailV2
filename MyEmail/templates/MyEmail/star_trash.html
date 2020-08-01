@@ -153,46 +153,15 @@
                             </a>
 
                             <div class="dropdown-menu">
-                                 {% if 'inbox' in request.get_full_path %}
-                                <a class="dropdown-item text-primary email_status_select"
-                                   data-email_status="read" href="#">Mark as read</a>
-
-                                <a class="dropdown-item text-secondary email_status_select"
-                                   data-email_status="unread" href="#">Mark as unread</a>
 
 
-                                <a class="dropdown-item text-warning email_status_select"
-                                   data-email_status="spam" href="#">Spam</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger email_status_select"
-                                   data-email_status="delete" href="#">Delete</a>
 
-                                {% elif 'send' in request.get_full_path %}
-                                <a class="dropdown-item text-danger email_status_select"
-                                   data-email_status="delete" href="#">Delete</a>
-
-                                {% elif 'draft' in request.get_full_path %}
-                                <a class="dropdown-item text-success email_status_select"
-                                   data-email_status="send" href="#">Send Email</a>
-                                <a class="dropdown-item text-danger email_status_select"
-                                   data-email_status="delete" href="#">Delete</a>
-
-                                {% elif 'starred' in request.get_full_path %}
                                 <a class="dropdown-item text-light email_status_select"
                                    data-email_status="star" href="#">UnMark as Star</a>
-                                {% elif 'spam' in request.get_full_path %}
-                                <a class="dropdown-item text-success email_status_select"
-                                   data-email_status="spam" href="#">UnMark as Spam</a>
-                                <a class="dropdown-item text-danger email_status_select"
-                                   data-email_status="delete" href="#">Delete</a>
-                                {% elif 'trash' in request.get_full_path %}
-                                <a class="dropdown-item text-success email_status_select"
-                                   data-email_status="delete" href="#">Recover Email</a>
-                                <a class="dropdown-item text-danger email_status_select"
-                                   data-email_status="remove" href="#">Empty Trash</a>
 
 
-                                {% endif %}
+
+
 
 
                             </div>
@@ -237,11 +206,10 @@
                     </ul>
                 </div>
                 <div class="action-right">
-                    <form class="d-flex mr-3" method="GET" {% if email_type == "draft" %}
-                                      action="{% url 'mail_draft_class' %}"
-                                                {%else%}
-                                        action="{% url 'mail_list_class' %}"
-                                                {%endif%}>
+                    <form class="d-flex mr-3" method="GET"
+                                                    {% if email_type == "starred" %}
+                                                    action="{% url 'star_trash_class' %}"
+                                                              {% endif %}>
                         <a href="#" class="app-sidebar-menu-button btn btn-outline-light">
                             <i data-feather="menu" class="width-15 height-15"></i>
                         </a>
@@ -273,14 +241,6 @@
                                            href="{% url 'star_trash_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
                                             {%endif%}
 
-                                           {%if "mail_list_class" in request.get_full_path%}
-                                           href="{% url 'mail_list_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
-                                            {%endif%}
-
-                                           {% if "mail_draft_class" in request.get_full_path%}
-                                           href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.previous_page_number }}"
-                                            {%endif%}
-
 
                                            aria-label="Previous">
                                             <i class="ti-arrow-left"></i>
@@ -291,17 +251,11 @@
                                    <li class="page-item">
                                     {% if page_obj.has_next %}
                                         <a class="page-link"
-                                           {%if "mail_list_class" in request.get_full_path%}
-                                             href="{% url 'mail_list_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
-                                          {%endif%}
+
 
                                            {% if "star_trash_class" in request.get_full_path %}
                                              href="{% url 'star_trash_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
                                            {%endif%}
-
-                                           {%if "mail_draft_class" in request.get_full_path %}
-                                            href="{% url 'mail_draft_class'%}?email_type={{email_type}}&filter={{filter}}&page={{ page_obj.next_page_number }}"
-                                            {%endif%}
 
                                            aria-label="Next">
                                             <i class="ti-arrow-right"></i>
@@ -326,6 +280,7 @@
 
                         {%if email.rec_obj%}
                         <li class="list-group-item card_display_email"
+
                             data-email_detail_url="{% url 'mail_detail' email.rec_obj.pk %}"
                             list_email_id="{{email.rec_obj.pk}}"
                             id="email_list_li{{ email.rec_obj.pk }}"
@@ -334,13 +289,14 @@
                             data-email_sender="{{email.sender}} &lt{{email.sender.email}}&gt"
                             data-email_label="{{email.get_label_display}}"
 
-                            data-email_viewed_date="{{email.received_date}}"
+                            data-email_viewed_date="{{email.rec_obj.received_date}}"
                             data-email_attached_files="{% if email.file_upload %}{{email.file_upload.url}}{% endif %}"
                             data-email_file_name="{% if email.file_upload %}{{email.file_upload.name}}{% endif %}">
                             <div>
                                 <div class="custom-control custom-checkbox mr-2">
                                     <input type="checkbox" class="custom-control-input email_checkbox"
-                                           data-email_id="{{email.pk}}"
+                                           data_email_model = "rec"
+                                           data-email_id="{{email.rec_obj.pk}}"
                                            id="customCheck{{forloop.counter}}">
                                     <label class="custom-control-label"
                                            for="customCheck{{forloop.counter}}"></label>
@@ -350,9 +306,9 @@
 
 
                                 {% if '?email_type=starred' in request.get_full_path %}
-                                <a href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}"
+                                <a href="{%url 'mail_starred' email.rec_obj.pk%}?email_type={{email_type}}"
                                    class="add-star mr-3" title="Add stars">
-                                    <i class="fa font-size-16{%if email.sender_starred%} text-warning fa-star {% else %} fa-star-o {%endif%} "></i></a>
+                                    <i class="fa font-size-16{%if email.rec_obj.mail_starred%} text-warning fa-star {% else %} fa-star-o {%endif%} "></i></a>
                                 {%endif%}
 
 
@@ -374,7 +330,7 @@
                                     <div class="pl-3 d-flex">
                                                 <span class="text-nowrap text-muted">
 
-                                                    {{email.created_date|date:"d F"}}
+                                                    {{email.rec_obj.received_date|date:"d F"}}
 
                                                 </span>
 
@@ -393,13 +349,11 @@
 
                                                 {%if '?email_type=starred' in request.get_full_path%}
                                                 <a class="dropdown-item text-info"
-                                                   href="{%url 'mail_starred' email.pk%}?email_type={{email_type}}">Remove
+                                                   href="{%url 'mail_starred' email.rec_obj.pk%}?email_type={{email_type}}">Remove
                                                     Star</a>
-                                                <a class="dropdown-item text-warning"
-                                                   href="{%url 'mail_spam' email.pk%}?email_type={{email_type}}">Mark as
-                                                    Spam</a>
+
                                                 <a class="dropdown-item text-danger"
-                                                   href="{%url 'mail_deleted' email.pk%}?email_type={{email_type}}">Delete</a>
+                                                   href="{%url 'mail_deleted' email.rec_obj.pk%}?email_type={{email_type}}">Delete</a>
                                                 {%endif%}
 
 
@@ -461,6 +415,7 @@
                             <div>
                                 <div class="custom-control custom-checkbox mr-2">
                                     <input type="checkbox" class="custom-control-input email_checkbox"
+                                           data_email_model = "mail"
                                            data-email_id="{{email.pk}}"
                                            id="customCheck{{forloop.counter}}">
                                     <label class="custom-control-label"
@@ -975,27 +930,25 @@
         $(".email_checkbox:checked").each(function(){
 
             let email_id = $(this).attr('data-email_id');
-            console.log("eamil", email_id);
+            let email_model = $(this).attr('data_email_model');
+            console.log("model", email_model);
 
 
             let get_url = "";
-            if (status === "spam"){
-                get_url = "{% url 'mail_spam' pk=1234 %}".replace('1234', email_id);
-            }
-            if (status === "delete"){
-                    {% if '?email_type=send' in request.get_full_path  %}
-                        get_url = "{% url 'sender_delete' pk=1234 %}".replace('1234', email_id);
-                    {%else%}
-                        get_url = "{% url 'mail_deleted' pk=1234 %}".replace('1234', email_id);
-                    {%endif%}
-            }
-            if (status === "unread"){
-                get_url = "{% url 'mail_unread' pk=1234 %}".replace('1234', email_id);
+            if (email_model === "rec"){
+
+                 if (status === "star"){
+                         get_url = "{% url 'mail_starred' pk=1234 %}".replace('1234', email_id);
+                    }
             }
 
-            if (status === "read"){
-                get_url = "{% url 'mail_viewed' pk=1234 %}".replace('1234', email_id);
-            }
+             if (email_model === "mail"){
+                    if (status === "star"){
+                            get_url = "{% url 'mail_starred' pk=1234 %}".replace('1234', email_id);
+                         }
+
+             }
+
 
             console.log(get_url);
             // ////////// ajax post:
